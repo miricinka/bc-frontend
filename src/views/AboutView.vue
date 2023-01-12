@@ -24,7 +24,6 @@ import { ref } from '@vue/reactivity';
     </span>
     <Button label="Greet" @click="openModal()"></Button>
   </div>
-  <CreateNews></CreateNews>
 </template>
 
 <style>

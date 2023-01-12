@@ -1,6 +1,6 @@
 import { ref } from "vue";
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 export interface News {
   id: number;
@@ -8,39 +8,49 @@ export interface News {
   updated_at: string;
   title: string;
   text: string;
-};
+}
 
-export interface GetNewsResponse {
-  data: News[];
-};
+export interface IStoreNewsError {
+  errors: {
+    title: string[];
+    text: string[];
+  };
+}
 
-export default function newsApi(){
-
+export default function newsApi() {
   const news = ref<News[]>();
+  const errors = ref<IStoreNewsError>();
 
   const getNews = async () => {
-    const response = await axios.get<GetNewsResponse>("http://127.0.0.1:8000/api/news");
-    news.value = response.data.data;
+    const response = await axios.get<News[]>("http://127.0.0.1:8000/api/news");
+    news.value = response.data;
   };
 
-  const destroyNews = async (id:number) =>{
-    if(!window.confirm("Are you sure?")){
-        return;
+  const destroyNews = async (id: number) => {
+    if (!window.confirm("Are you sure?")) {
+      return;
     }
     await axios.delete("http://127.0.0.1:8000/api/news/" + id);
-    await getNews();
-  }
+  };
 
-  const storeNews = async (data:{title:string, text:string}) => {
-    await axios.post("http://127.0.0.1:8000/api/news", data);
-    await getNews();
-}
+  const storeNews = async (data: { title: string; text: string }) => {
+    try {
+      await axios.post("http://127.0.0.1:8000/api/news", data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        errors.value = error.response?.data;
+        console.log(errors.value);
+      } else {
+        console.log("Unexpected error", error);
+      }
+    }
+  };
 
   return {
     news,
+    errors,
     getNews,
     storeNews,
     destroyNews,
   };
-
 }
