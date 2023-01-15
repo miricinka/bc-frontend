@@ -33,12 +33,13 @@ const deleteNews = async (id: number) => {
                 </div>
               </template>
               <template #content>
-                <div v-for="oneNews in news" :key="oneNews.id">
+                <div v-for="oneNews in news">
                   <News
-                    :id="oneNews.id"
-                    :title="oneNews.title"
-                    :text="oneNews.text"
-                    :dateCreated="oneNews.created_at"
+                    :id="oneNews.news.id"
+                    :title="oneNews.news.title"
+                    :text="oneNews.news.text"
+                    :dateCreated="oneNews.news.created_at"
+                    :commentCount="oneNews.commentCount"
                     @delete="deleteNews"
                   ></News>
                 </div>

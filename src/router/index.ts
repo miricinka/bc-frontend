@@ -17,12 +17,18 @@ const router = createRouter({
     {
       path: "/createNews",
       name: "createNews",
-      component: () => import("../views/news/CreateNews.vue"),
+      component: () => import("../views/news/CreatePost.vue"),
     },
     {
       path: "/news/:id/edit",
       name: "editNews",
-      component: () => import("../views/news/EditNews.vue"),
+      component: () => import("../views/news/EditPost.vue"),
+      props: true,
+    },
+    {
+      path: "/news/:id",
+      name: "comments",
+      component: () => import("../views/news/comments/Comments.vue"),
       props: true,
     },
   ],

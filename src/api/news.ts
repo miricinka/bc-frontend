@@ -10,6 +10,14 @@ export interface News {
   text: string;
 }
 
+export interface IComment {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  text: string;
+  news_id: number;
+}
+
 export interface IStoreNewsError {
   errors: {
     title: string[];
@@ -17,12 +25,25 @@ export interface IStoreNewsError {
   };
 }
 
+export interface IStoreCommentError {
+  errors: {
+    text: string[];
+  };
+}
+
+export interface INewsWithComment {
+  commentCount: number;
+  news: News;
+}
+
 export default function newsApi() {
-  const news = ref<News[]>();
+  const news = ref<INewsWithComment[]>();
   const errors = ref<IStoreNewsError>();
 
   const getNews = async () => {
-    const response = await axios.get<News[]>("http://127.0.0.1:8000/api/news");
+    const response = await axios.get<INewsWithComment[]>(
+      "http://127.0.0.1:8000/api/news"
+    );
     news.value = response.data;
   };
 

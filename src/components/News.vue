@@ -5,6 +5,7 @@ interface Props {
   title: string;
   text: string;
   dateCreated: string;
+  commentCount: number;
 }
 const props = defineProps<Props>();
 
@@ -24,16 +25,18 @@ const dateCreatedFormatted = date.toLocaleDateString();
         </Divider>
       </template>
       <template #content>
-        {{ text }}
+        <div v-if="text.length < 300">{{ text }}</div>
+        <div v-else>{{ text.substring(0, 300) + "..." }}</div>
       </template>
       <template #footer>
         <div class="d-flex justify-content-between">
           <div>
             <Button
-              label="2"
+              :label="`${commentCount}`"
               icon="pi pi-comment"
               iconPos="right"
               class="p-button-outlined p-button-secondary"
+              @click="$router.push({ path: `/news/${id}` })"
             />
           </div>
           <div>
