@@ -1,16 +1,14 @@
 <script setup lang="ts">
-  import CreateNews from '@/components/CreateNews.vue';
-import { ref } from '@vue/reactivity';
+import { ref } from "@vue/reactivity";
 
-  const value = ref<string>()
+const value = ref<string>();
 
-  const displayModal = ref(false);
+const displayModal = ref(false);
 
-  function openModal(){
-    displayModal.value = true;
-    console.log("display modal");
-  }
-
+function openModal() {
+  displayModal.value = true;
+  console.log("display modal");
+}
 </script>
 
 <template>
@@ -26,7 +24,4 @@ import { ref } from '@vue/reactivity';
   </div>
 </template>
 
-<style>
-</style>
-
-
+<style></style>
