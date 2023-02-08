@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { IAttendanceUserTable } from "@/shared/interface";
+import type {
+  IAttendanceDay,
+  IAttendanceUserTable,
+  IUser,
+} from "@/shared/interface";
 import axios from "axios";
 import { onMounted, ref } from "vue";
 
@@ -31,7 +35,7 @@ const getAttendance = async () => {
 async function submit() {
   try {
     await axios.post(
-      "http://127.0.0.1:8000/api/attendance",
+      "http://127.0.0.1:8000/api/attendanceDay",
       dates.value.map((entry) => {
         console.log(entry.toLocaleString());
         //return { date: entry.toISOString().slice(0, 19).replace("T", " ") };
@@ -48,6 +52,38 @@ async function submit() {
   } catch (error) {}
   console.log(dates.value);
   closeModal();
+}
+
+async function checkboxChange(day: IAttendanceDay, student: IUser) {
+  if (table.value) {
+    if (
+      table.value.attendance.find(
+        (entry) =>
+          entry.attendance_day_id === day.id &&
+          entry.username === student.username
+      )
+    ) {
+      await axios.delete("http://127.0.0.1:8000/api/attendance", {
+        data: {
+          username: student.username,
+          attendance_day_id: day.id,
+        },
+      });
+    } else {
+      await axios.post("http://127.0.0.1:8000/api/attendance", {
+        username: student.username,
+        attendance_day_id: day.id,
+      });
+    }
+  }
+}
+
+async function deleteDay(date: IAttendanceDay) {
+  if (!window.confirm("Opravdu tento den smazat?")) {
+    return;
+  }
+  await axios.delete("http://127.0.0.1:8000/api/attendance/" + date.id);
+  await getAttendance();
 }
 </script>
 
@@ -77,6 +113,7 @@ async function submit() {
                     <Button
                       icon="pi pi-trash"
                       class="p-button-danger p-button-sm"
+                      @click="deleteDay(date)"
                     />
                   </span>
                 </div>
@@ -94,6 +131,7 @@ async function submit() {
                   }"
                   name="category"
                   v-model="table.attendance"
+                  @click="checkboxChange(date, student)"
                 />
               </td>
             </tr>
