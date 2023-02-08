@@ -38,12 +38,18 @@ const visible = ref(false);
             >
           </li>
           <li class="nav-item">
-            <RouterLink to="/about" class="nav-link" @click="visible = !visible"
+            <RouterLink
+              to="/activities"
+              class="nav-link"
+              @click="visible = !visible"
               >Aktivity</RouterLink
             >
           </li>
           <li class="nav-item">
-            <RouterLink to="/about" class="nav-link" @click="visible = !visible"
+            <RouterLink
+              to="/attendance"
+              class="nav-link"
+              @click="visible = !visible"
               >Docházka</RouterLink
             >
           </li>

@@ -36,6 +36,16 @@ const router = createRouter({
       component: () => import("../views/news/comments/Comments.vue"),
       props: true,
     },
+    {
+      path: "/activities",
+      name: "activities",
+      component: () => import("../views/activities/ActivitiesView.vue"),
+    },
+    {
+      path: "/attendance",
+      name: "attendance",
+      component: () => import("../views/attendance/AttendanceView.vue"),
+    },
   ],
 });
 
