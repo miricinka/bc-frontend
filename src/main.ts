@@ -15,7 +15,7 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import "./assets/base.css";
 
 import InputNumber from "primevue/inputnumber";
-import DataTable from "primevue/datatable";
+import RadioButton from "primevue/radiobutton";
 import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
 import Textarea from "primevue/textarea";
@@ -28,6 +28,7 @@ import Card from "primevue/card";
 
 import News from "./components/News.vue";
 import Comment from "./components/Comment.vue";
+import Tournament from "./components/Tournament.vue";
 
 const app = createApp(App);
 
@@ -40,13 +41,14 @@ app.component("Card", Card);
 app.component("Divider", Divider);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);
-app.component("DataTable", DataTable);
 app.component("Column", Column);
 app.component("Checkbox", Checkbox);
 app.component("InputNumber", InputNumber);
 app.component("Calendar", Calendar);
+app.component("RadioButton", RadioButton);
 
 app.component("News", News);
 app.component("Comment", Comment);
+app.component("Tournament", Tournament);
 
 app.mount("#app");

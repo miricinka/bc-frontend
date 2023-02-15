@@ -204,4 +204,14 @@ async function deleteActivity(activity: IActivity) {
   </div>
 </template>
 
-<style></style>
+<style>
+table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+table th,
+table td {
+  overflow: hidden;
+}
+</style>

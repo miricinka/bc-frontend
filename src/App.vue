@@ -53,6 +53,14 @@ const visible = ref(false);
               >Docházka</RouterLink
             >
           </li>
+          <li class="nav-item">
+            <RouterLink
+              to="/tournaments"
+              class="nav-link"
+              @click="visible = !visible"
+              >Turnaje</RouterLink
+            >
+          </li>
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">

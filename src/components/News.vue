@@ -8,9 +8,6 @@ interface Props {
   commentCount: number;
 }
 const props = defineProps<Props>();
-
-let date: Date = new Date(props.dateCreated);
-const dateCreatedFormatted = date.toLocaleDateString();
 </script>
 
 <template>
@@ -20,7 +17,7 @@ const dateCreatedFormatted = date.toLocaleDateString();
         {{ title }}
         <Divider align="right">
           <div class="inline-flex align-items-center">
-            <b>{{ dateCreatedFormatted }}</b>
+            <b>{{ `${new Date(dateCreated).toLocaleDateString()}` }}</b>
           </div>
         </Divider>
       </template>

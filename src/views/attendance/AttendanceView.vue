@@ -37,8 +37,6 @@ async function submit() {
     await axios.post(
       "http://127.0.0.1:8000/api/attendanceDay",
       dates.value.map((entry) => {
-        console.log(entry.toLocaleString());
-        //return { date: entry.toISOString().slice(0, 19).replace("T", " ") };
         return {
           date: new Date(entry.getTime() - entry.getTimezoneOffset() * 60000)
             .toISOString()

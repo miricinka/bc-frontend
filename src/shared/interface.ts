@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 export interface IActivity {
   name: string;
   weight: number;
@@ -38,4 +36,13 @@ export interface IAttendanceUserTable {
   users: IUser[];
   attendanceDays: IAttendanceDay[];
   attendance: IAttendace[];
+}
+
+export interface ITournament {
+  id: number;
+  title: string;
+  date: string;
+  description: string;
+  users_count?: number;
+  users?: IUser[];
 }

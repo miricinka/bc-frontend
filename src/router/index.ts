@@ -46,6 +46,17 @@ const router = createRouter({
       name: "attendance",
       component: () => import("../views/attendance/AttendanceView.vue"),
     },
+    {
+      path: "/tournaments",
+      name: "tournaments",
+      component: () => import("../views/tournaments/TournamentsView.vue"),
+    },
+    {
+      path: "/tournaments/:id",
+      name: "tournament",
+      component: () => import("../views/tournaments/TournamentView.vue"),
+      props: true,
+    },
   ],
 });
 
