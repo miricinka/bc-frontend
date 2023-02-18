@@ -88,11 +88,7 @@ async function getTournament() {
                     }"
                   >
                     <template v-if="user.username !== userColumn.username">
-                      <RadioButton
-                        name="city"
-                        value="Win"
-                        v-model="results.find(entry => entry.blackPlayer === user.username) || "
-                      />
+                      <RadioButton name="city" value="Win" />
                       <RadioButton name="city" value="Lose" v-model="results" />
                       <RadioButton name="city" value="Tie" v-model="results" />
                     </template>
