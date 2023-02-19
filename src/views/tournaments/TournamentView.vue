@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onMounted, ref } from "vue";
-import type { ITournament } from "@/shared/interface";
+import type { ITournament, IUser } from "@/shared/interface";
 
 interface Props {
   id: string;
@@ -11,7 +11,7 @@ const props = defineProps<Props>();
 interface GameResult {
   black: string;
   white: string;
-  winner: string;
+  winner: string | null;
 }
 
 onMounted(() => {
@@ -27,16 +27,39 @@ async function getTournament() {
     "http://127.0.0.1:8000/api/tournament/" + props.id
   );
   tournament.value = response.data;
+  //map api games to gameResult structure (omit ids and pgn)
+  results.value = tournament.value.games.map((game) => {
+    return { black: game.black, white: game.white, winner: game.winner };
+  });
 }
 
-async function checkboxChange(black: string, white: string, winner: string) {
-  console.log(black + white + winner);
-  console.log(results.value);
+async function checkboxChange(
+  black: string,
+  white: string,
+  winner: string | null
+) {
+  await axios.put("http://127.0.0.1:8000/api/game", {
+    black: black,
+    white: white,
+    winner: winner,
+    tournament_id: tournament.value?.id,
+  });
+
+  //remove old value from frontend
   results.value = results.value.filter(
     (entry) => !(entry.black == black && entry.white == white)
   );
+  //add new value
   results.value.push({ black: black, white: white, winner: winner });
-  console.log(results.value);
+}
+
+function getUser(username: string): IUser | null {
+  if (tournament.value?.users) {
+    return (
+      tournament.value.users.find((user) => user.username === username) || null
+    );
+  }
+  return null;
 }
 </script>
 
@@ -138,7 +161,7 @@ async function checkboxChange(black: string, white: string, winner: string) {
                           :value="{
                             black: user.username,
                             white: userColumn.username,
-                            winner: '',
+                            winner: null,
                           }"
                           name="category"
                           v-model="results"
@@ -146,7 +169,7 @@ async function checkboxChange(black: string, white: string, winner: string) {
                             checkboxChange(
                               user.username,
                               userColumn.username,
-                              ''
+                              null
                             )
                           "
                         />
@@ -191,7 +214,7 @@ async function checkboxChange(black: string, white: string, winner: string) {
                           :value="{
                             black: userColumn.username,
                             white: user.username,
-                            winner: '',
+                            winner: null,
                           }"
                           name="category"
                           v-model="results"
@@ -199,7 +222,7 @@ async function checkboxChange(black: string, white: string, winner: string) {
                             checkboxChange(
                               userColumn.username,
                               user.username,
-                              ''
+                              null
                             )
                           "
                         />
