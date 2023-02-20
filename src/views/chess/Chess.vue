@@ -42,7 +42,7 @@ const currentFen = ref<string>();
 history.value = chess.history({ verbose: true });
 //historyGlobal.value = history;
 
-var index: number = 0;
+const index = ref<number>(0);
 let max = history.value.length;
 var isNextDisabled = ref(false);
 var isPrevDisabled = ref(true);
@@ -69,7 +69,7 @@ function handleCheckmate(isMated: string) {
 }
 
 function reset() {
-  index = 0;
+  index.value = 0;
   boardAPI.value?.resetBoard();
   chess.reset();
   isNextDisabled.value = false;
@@ -85,33 +85,33 @@ function lastMove() {
   currentComment.value = allComments.find(
     (comment) => comment.fen === currentFen.value
   )?.comment;
-  index = index - 1;
-  if (index === 0) {
+  index.value = index.value - 1;
+  if (index.value === 0) {
     isPrevDisabled.value = true;
     isNextDisabled.value = false;
     return;
   }
-  console.log(index);
+  console.log(index.value);
 }
 
 function nextMove() {
   isPrevDisabled.value = false;
   if (history.value) {
-    var fromSquare = <Square>history.value[index].from;
-    var toSquare = <Square>history.value[index].to;
+    var fromSquare = <Square>history.value[index.value].from;
+    var toSquare = <Square>history.value[index.value].to;
     boardAPI.value?.makeMove(fromSquare, toSquare);
     chess.move({ from: fromSquare, to: toSquare });
     currentFen.value = chess.fen();
     currentComment.value = allComments.find(
       (comment) => comment.fen === currentFen.value
     )?.comment;
-    if (index < max) {
-      index = index + 1;
+    if (index.value < max) {
+      index.value = index.value + 1;
     }
-    if (index === max) {
+    if (index.value === max) {
       isNextDisabled.value = true;
     }
-    console.log(index);
+    console.log(index.value);
   }
 }
 
@@ -122,11 +122,6 @@ function loadNewPgn(): void {
   max = history.value.length;
   console.log(history);
   reset();
-}
-
-function isHighlighted(moveIndex: number) {
-  console.log(moveIndex);
-  return index === moveIndex + 1 ? true : false;
 }
 </script>
 
@@ -169,7 +164,7 @@ function isHighlighted(moveIndex: number) {
               <span v-if="(moveIndex + 1) % 2" class="sec">
                 {{ moveIndex / 2 + 1 }}.
               </span>
-              <span v-if="isHighlighted(moveIndex)" class="move higlighted">{{
+              <span v-if="index === moveIndex + 1" class="move higlighted">{{
                 move.san + " "
               }}</span>
               <span v-else class="move">{{ move.san + " " }}</span>
