@@ -38,7 +38,8 @@ export interface IAttendanceUserTable {
   attendance: IAttendace[];
 }
 
-export interface Game {
+export interface IGame {
+  id: number;
   black: string;
   white: string;
   winner: string;
@@ -52,5 +53,5 @@ export interface ITournament {
   description: string;
   users_count?: number;
   users?: IUser[];
-  games: Game[];
+  games: IGame[];
 }

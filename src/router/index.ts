@@ -15,9 +15,10 @@ const router = createRouter({
       component: () => import("../views/AboutView.vue"),
     },
     {
-      path: "/chess",
+      path: "/chess/:id?",
       name: "chess",
       component: () => import("../views/chess/Chess.vue"),
+      props: true,
     },
     {
       path: "/createNews",

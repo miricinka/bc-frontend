@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import type { ITournament, IUser } from "@/shared/interface";
+import router from "@/router";
 
 interface Props {
   id: string;
 }
 const props = defineProps<Props>();
+const displayModal = ref<boolean>(false);
 
 interface GameResult {
   black: string;
   white: string;
   winner: string | null;
 }
+
+const form = reactive({
+  black: "",
+  white: "",
+  pgn: "",
+});
 
 onMounted(() => {
   getTournament();
@@ -60,6 +68,55 @@ function getUser(username: string): IUser | null {
     );
   }
   return null;
+}
+
+function openPGNModal(result: GameResult) {
+  form.black = result.black;
+  form.white = result.white;
+  displayModal.value = true;
+}
+
+function closeModal() {
+  displayModal.value = false;
+}
+
+function hasPGN(result: GameResult): boolean {
+  if (tournament.value) {
+    if (
+      tournament.value.games.find(
+        (entry) =>
+          entry.black == result.black &&
+          entry.white == result.white &&
+          entry.pgn
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function playPGN(result: GameResult) {
+  let entry;
+  if (tournament.value) {
+    entry = tournament.value.games.find(
+      (entry) =>
+        entry.black == result.black && entry.white == result.white && entry.pgn
+    );
+  }
+  console.log(entry?.pgn);
+  router.push({ name: "chess", params: { id: entry?.id } });
+}
+
+async function uploadPGN(black: string, white: string, pgn: string) {
+  await axios.put("http://127.0.0.1:8000/api/game", {
+    black: black,
+    white: white,
+    pgn: pgn,
+    tournament_id: tournament.value?.id,
+  });
+  getTournament();
+  closeModal();
 }
 </script>
 
@@ -241,13 +298,57 @@ function getUser(username: string): IUser | null {
                 <span> black: {{ result.black }}</span>
                 <span> white: {{ result.white }}</span>
                 <span> winner: {{ result.winner }}</span>
+                <Button
+                  label="Nahrát partii"
+                  icon="pi pi-check"
+                  @click="openPGNModal(result)"
+                ></Button>
+                <template v-if="hasPGN(result)">
+                  <Button
+                    label="Přehrát partii"
+                    icon="pi pi-check"
+                    @click="playPGN(result)"
+                  ></Button>
+                </template>
               </div>
             </template>
           </div>
         </div>
       </template>
     </Card>
-    {{ results }}
+    <Dialog
+      header="Přidat partii"
+      v-model:visible="displayModal"
+      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+      :style="{ width: '50vw' }"
+      :modal="true"
+    >
+      <form @submit.prevent="uploadPGN(form.black, form.white, form.pgn)">
+        <div class="my-6">
+          <h5 id="text-area-text">Černý hráč</h5>
+          <InputText type="text" v-model="form.black" disabled="true" />
+          <h5 id="text-area-text">Bílý hráč</h5>
+          <InputText type="text" v-model="form.white" disabled="true" />
+          <h5 id="text-area-text">PGN</h5>
+          <Textarea
+            v-model="form.pgn"
+            :autoResize="true"
+            rows="5"
+            cols="50"
+            aria-labelledby="text-area-text"
+          />
+        </div>
+        <div>
+          <Button
+            label="Zpět"
+            icon="pi pi-times"
+            @click="closeModal()"
+            class="p-button-text"
+          />
+          <Button label="Nahrát" icon="pi pi-check" type="submit" />
+        </div>
+      </form>
+    </Dialog>
   </div>
 </template>
 <style>
