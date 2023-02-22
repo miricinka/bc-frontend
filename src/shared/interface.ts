@@ -55,3 +55,11 @@ export interface ITournament {
   users?: IUser[];
   games: IGame[];
 }
+
+export interface INews {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  text: string;
+}

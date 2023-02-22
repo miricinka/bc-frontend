@@ -1,17 +1,31 @@
 <script setup lang="ts">
 import type News from "@/components/News.vue";
-import newsApi from "@/api/news";
-import { onMounted } from "vue";
+import newsApi, { type INewsWithComment } from "@/api/news";
+import { onMounted, ref } from "vue";
+import type { PageState } from "primevue/paginator";
 
 const { news, getNews, destroyNews } = newsApi();
+const visibleNews = ref<INewsWithComment[]>([]);
 
-onMounted(() => getNews());
+onMounted(async () => {
+  await getNews();
+  if (news.value) {
+    visibleNews.value = news.value.slice(0, 3);
+  }
+});
 
 const deleteNews = async (id: number) => {
   console.log(id);
   await destroyNews(id);
   await getNews();
 };
+
+function onPage(event: PageState) {
+  console.log(event);
+  if (news.value) {
+    visibleNews.value = news.value.slice(event.first, event.first + event.rows);
+  }
+}
 </script>
 
 <template>
@@ -33,7 +47,7 @@ const deleteNews = async (id: number) => {
                 </div>
               </template>
               <template #content>
-                <div v-for="oneNews in news">
+                <div v-for="oneNews in visibleNews">
                   <News
                     :id="oneNews.news.id"
                     :title="oneNews.news.title"
@@ -43,6 +57,11 @@ const deleteNews = async (id: number) => {
                     @delete="deleteNews"
                   ></News>
                 </div>
+                <Paginator
+                  :rows="3"
+                  :totalRecords="news?.length"
+                  @page="onPage($event)"
+                ></Paginator>
               </template>
             </Card>
           </div>

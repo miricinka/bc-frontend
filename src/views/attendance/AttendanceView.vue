@@ -100,41 +100,43 @@ async function deleteDay(date: IAttendanceDay) {
         </div>
       </template>
       <template #content>
-        <table v-if="table" class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th scope="col" v-for="date in table.attendanceDays">
-                <div class="d-flex flex-column">
-                  <span>
-                    {{ new Date(date.date).toLocaleDateString() }}
-                    <Button
-                      icon="pi pi-trash"
-                      class="p-button-danger p-button-sm"
-                      @click="deleteDay(date)"
-                    />
-                  </span>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="student in table.users">
-              <th scope="row">{{ student.name }}</th>
-              <td v-for="date in table.attendanceDays">
-                <Checkbox
-                  :value="{
-                    attendance_day_id: date.id,
-                    username: student.username,
-                  }"
-                  name="category"
-                  v-model="table.attendance"
-                  @click="checkboxChange(date, student)"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="scrollable">
+          <table v-if="table" class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col" v-for="date in table.attendanceDays">
+                  <div class="d-flex flex-column">
+                    <span>
+                      {{ new Date(date.date).toLocaleDateString() }}
+                      <Button
+                        icon="pi pi-trash"
+                        class="p-button-danger p-button-sm"
+                        @click="deleteDay(date)"
+                      />
+                    </span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="student in table.users">
+                <th scope="row">{{ student.name }}</th>
+                <td v-for="date in table.attendanceDays">
+                  <Checkbox
+                    :value="{
+                      attendance_day_id: date.id,
+                      username: student.username,
+                    }"
+                    name="category"
+                    v-model="table.attendance"
+                    @click="checkboxChange(date, student)"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </template>
     </Card>
     <Dialog
@@ -176,3 +178,9 @@ async function deleteDay(date: IAttendanceDay) {
     </Dialog>
   </div>
 </template>
+
+<style>
+.scrollable {
+  overflow-x: auto;
+}
+</style>

@@ -40,7 +40,6 @@ let allComments = chess.getComments();
 const currentComment = ref<string>();
 const currentFen = ref<string>();
 history.value = chess.history({ verbose: true });
-//historyGlobal.value = history;
 
 const index = ref<number>(0);
 let max = history.value.length;
@@ -151,27 +150,29 @@ function loadNewPgn(): void {
             </Button>
             <Divider></Divider>
             <h5>PGN k přehrání</h5>
-            <Textarea
-              id="load-pgn"
-              type="text"
-              cols="50"
-              :autoResize="true"
-              v-model="pgn"
-            />
+            <Textarea id="load-pgn" type="text" cols="40" v-model="pgn" />
             <Button @click="loadNewPgn()">Nahrát</Button>
             <Divider></Divider>
-            <template v-for="(move, moveIndex) in history">
-              <span v-if="(moveIndex + 1) % 2" class="sec">
-                {{ moveIndex / 2 + 1 }}.
+            <div class="comment">
+              <h5>Komentář</h5>
+              <span>
+                {{ currentComment }}
               </span>
-              <span v-if="index === moveIndex + 1" class="move higlighted">{{
-                move.san + " "
-              }}</span>
-              <span v-else class="move">{{ move.san + " " }}</span>
-              <br v-if="moveIndex % 2" />
-            </template>
+            </div>
             <Divider></Divider>
-            {{ currentComment }}
+            <div class="moves">
+              <h5>Tahy</h5>
+              <template v-for="(move, moveIndex) in history">
+                <span v-if="(moveIndex + 1) % 2" class="sec">
+                  {{ moveIndex / 2 + 1 }}.
+                </span>
+                <span v-if="index === moveIndex + 1" class="move higlighted">{{
+                  move.san + " "
+                }}</span>
+                <span v-else class="move">{{ move.san + " " }}</span>
+                <br v-if="moveIndex % 2" />
+              </template>
+            </div>
           </div>
         </div>
       </template>
@@ -188,12 +189,16 @@ function loadNewPgn(): void {
 }
 
 span.move {
-  border-radius: 30%;
+  border-radius: 15%;
   padding: 4px;
   margin: 1px;
 }
 
 span.higlighted {
   background-color: #ffc107;
+}
+
+.comment {
+  height: 80px;
 }
 </style>

@@ -119,44 +119,46 @@ async function deleteActivity(activity: IActivity) {
         </div>
       </template>
       <template #content>
-        <table v-if="table" class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th scope="col" v-for="activity in table.activities">
-                <div class="d-flex flex-column">
-                  <span>
-                    {{ activity.name }}
-                    <Button
-                      icon="pi pi-trash"
-                      @click="deleteActivity(activity)"
-                      class="p-button-danger p-button-sm"
-                    />
-                  </span>
-                  <span> {{ activity.weight }} xp </span>
-                </div>
-              </th>
-              <th scope="col">Celkem</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="student in table.users">
-              <th scope="row">{{ student.name }}</th>
-              <td v-for="activity in table.activities">
-                <Checkbox
-                  :value="{
-                    activity: activity.name,
-                    username: student.username,
-                  }"
-                  name="category"
-                  v-model="table.done"
-                  @click="checkboxChange(activity, student)"
-                />
-              </td>
-              <td>{{ countPoints(student) }} xp</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="scrollable">
+          <table v-if="table" class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col" v-for="activity in table.activities">
+                  <div class="d-flex flex-column">
+                    <span>
+                      {{ activity.name }}
+                      <Button
+                        icon="pi pi-trash"
+                        @click="deleteActivity(activity)"
+                        class="p-button-danger p-button-sm"
+                      />
+                    </span>
+                    <span> {{ activity.weight }} xp </span>
+                  </div>
+                </th>
+                <th scope="col">Celkem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="student in table.users">
+                <th scope="row">{{ student.name }}</th>
+                <td v-for="activity in table.activities">
+                  <Checkbox
+                    :value="{
+                      activity: activity.name,
+                      username: student.username,
+                    }"
+                    name="category"
+                    v-model="table.done"
+                    @click="checkboxChange(activity, student)"
+                  />
+                </td>
+                <td>{{ countPoints(student) }} xp</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </template>
     </Card>
     <Dialog
@@ -213,5 +215,9 @@ table {
 table th,
 table td {
   overflow: hidden;
+}
+
+.scrollable {
+  overflow-x: auto;
 }
 </style>

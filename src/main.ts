@@ -14,7 +14,10 @@ import "bootstrap/dist/js/bootstrap.min.js";
 
 import "./assets/base.css";
 
+import TabView from "primevue/tabview";
+import TabPanel from "primevue/tabpanel";
 import InputNumber from "primevue/inputnumber";
+import Paginator from "primevue/paginator";
 import RadioButton from "primevue/radiobutton";
 import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
@@ -46,6 +49,9 @@ app.component("Checkbox", Checkbox);
 app.component("InputNumber", InputNumber);
 app.component("Calendar", Calendar);
 app.component("RadioButton", RadioButton);
+app.component("TabView", TabView);
+app.component("TabPanel", TabPanel);
+app.component("Paginator", Paginator);
 
 app.component("News", News);
 app.component("Comment", Comment);
