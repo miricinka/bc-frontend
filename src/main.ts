@@ -21,6 +21,7 @@ import InputNumber from "primevue/inputnumber";
 import Paginator from "primevue/paginator";
 import RadioButton from "primevue/radiobutton";
 import ProgressSpinner from "primevue/progressspinner";
+import Skeleton from "primevue/skeleton";
 import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
 import Textarea from "primevue/textarea";
@@ -60,6 +61,7 @@ app.component("TabPanel", TabPanel);
 app.component("Paginator", Paginator);
 app.component("ProgressSpinner", ProgressSpinner);
 app.component("Toast", Toast);
+app.component("Skeleton", Skeleton);
 
 app.directive("tooltip", Tooltip);
 

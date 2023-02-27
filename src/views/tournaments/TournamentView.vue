@@ -13,6 +13,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const displayModal = ref<boolean>(false);
+const showSkeleton = ref<boolean>(false);
 
 interface GameResult {
   black: string;
@@ -50,19 +51,29 @@ async function checkboxChange(
   white: string,
   winner: string | null
 ) {
-  await axios.put("http://127.0.0.1:8000/api/game", {
-    black: black,
-    white: white,
-    winner: winner,
-    tournament_id: tournament.value?.id,
-  });
-
+  showSkeleton.value = true;
+  try {
+    await axios.put("http://127.0.0.1:8000/api/game", {
+      black: black,
+      white: white,
+      winner: winner,
+      tournament_id: tournament.value?.id,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      detail: "Změnu se nepodařilo uložit",
+      life: 3000,
+    });
+    return;
+  }
   //remove old value from frontend
   results.value = results.value.filter(
     (entry) => !(entry.black == black && entry.white == white)
   );
   //add new value
   results.value.push({ black: black, white: white, winner: winner });
+  showSkeleton.value = false;
 }
 
 function getUser(username: string): IUser | null {
@@ -344,27 +355,35 @@ async function uploadPGN(black: string, white: string, pgn: string) {
             <Divider></Divider>
             <div class="games">
               <h3>Jednotlivé partie</h3>
-              <template v-for="result in results">
-                <div>
-                  <span> black: {{ result.black }}</span>
-                  <span> white: {{ result.white }}</span>
-                  <span> winner: {{ result.winner }}</span>
-                  <Button
-                    label="Nahrát partii"
-                    icon="pi pi-plus"
-                    class="p-button-raised p-button-success"
-                    @click="openPGNModal(result)"
-                  ></Button>
-                  <template v-if="hasPGN(result)">
+              <div class="skeleton" v-if="showSkeleton">
+                <Skeleton width="40rem" class="mb-3"></Skeleton>
+                <Skeleton width="38rem" class="mb-3"></Skeleton>
+                <Skeleton width="40rem" class="mb-3"></Skeleton>
+                <Skeleton width="38rem" class="mb-3"></Skeleton>
+              </div>
+              <div v-else>
+                <template v-for="result in results">
+                  <div class="result">
+                    <span> black: {{ result.black }}</span>
+                    <span> white: {{ result.white }}</span>
+                    <span> winner: {{ result.winner }}</span>
                     <Button
-                      label="Přehrát partii"
-                      icon="pi pi-play"
-                      class="p-button-raised"
-                      @click="playPGN(result)"
+                      label="Nahrát partii"
+                      icon="pi pi-plus"
+                      class="p-button-raised p-button-success"
+                      @click="openPGNModal(result)"
                     ></Button>
-                  </template>
-                </div>
-              </template>
+                    <template v-if="hasPGN(result)">
+                      <Button
+                        label="Přehrát partii"
+                        icon="pi pi-play"
+                        class="p-button-raised"
+                        @click="playPGN(result)"
+                      ></Button>
+                    </template>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
         </template>
