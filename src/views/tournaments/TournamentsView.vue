@@ -2,6 +2,9 @@
 import type { ITournament } from "@/shared/interface";
 import axios from "axios";
 import { onMounted, reactive, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 onMounted(() => {
   getTournaments();
@@ -40,9 +43,23 @@ async function submit(data: { title: string; date: any; description: string }) {
     .replace("T", " ");
   try {
     await axios.post("http://127.0.0.1:8000/api/tournament", data);
+
     await getTournaments();
     closeModal();
-  } catch (error) {}
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Turnament",
+      detail: "Turnament se nepodařilo vyvořit",
+      life: 3000,
+    });
+  }
+  toast.add({
+    severity: "success",
+    summary: "Turnament",
+    detail: "Turnament vytvořen",
+    life: 3000,
+  });
 }
 
 async function deleteTournament(tournament: ITournament) {
@@ -67,53 +84,55 @@ async function deleteTournament(tournament: ITournament) {
           />
         </div>
       </template>
-      <template #content v-if="tournaments">
-        <TabView>
-          <TabPanel header="Vše">
-            <template v-for="tournament in tournaments">
-              <Tournament
-                :id="tournament.id"
-                :title="tournament.title"
-                :date="tournament.date"
-                :description="tournament.description"
-                :usersCount="tournament.users_count"
-                @delete="deleteTournament(tournament)"
-                @click="$router.push('/tournaments/' + tournament.id)"
-              >
-              </Tournament>
-            </template>
-          </TabPanel>
-          <TabPanel header="Nadcházející">
-            <template v-for="tournament in tournaments">
-              <Tournament
-                v-if="new Date(tournament.date) >= new Date()"
-                :id="tournament.id"
-                :title="tournament.title"
-                :date="tournament.date"
-                :description="tournament.description"
-                :usersCount="tournament.users_count"
-                @delete="deleteTournament(tournament)"
-                @click="$router.push('/tournaments/' + tournament.id)"
-              >
-              </Tournament>
-            </template>
-          </TabPanel>
-          <TabPanel header="Minulé">
-            <template v-for="tournament in tournaments">
-              <Tournament
-                v-if="new Date(tournament.date) < new Date()"
-                :id="tournament.id"
-                :title="tournament.title"
-                :date="tournament.date"
-                :description="tournament.description"
-                :usersCount="tournament.users_count"
-                @delete="deleteTournament(tournament)"
-                @click="$router.push('/tournaments/' + tournament.id)"
-              >
-              </Tournament>
-            </template>
-          </TabPanel>
-        </TabView>
+      <template #content>
+        <template v-if="tournaments">
+          <TabView>
+            <TabPanel header="Vše">
+              <template v-for="tournament in tournaments">
+                <Tournament
+                  :id="tournament.id"
+                  :title="tournament.title"
+                  :date="tournament.date"
+                  :usersCount="tournament.users_count"
+                  @delete="deleteTournament(tournament)"
+                  @click="$router.push('/tournaments/' + tournament.id)"
+                >
+                </Tournament>
+              </template>
+            </TabPanel>
+            <TabPanel header="Nadcházející">
+              <template v-for="tournament in tournaments">
+                <Tournament
+                  v-if="new Date(tournament.date) >= new Date()"
+                  :id="tournament.id"
+                  :title="tournament.title"
+                  :date="tournament.date"
+                  :usersCount="tournament.users_count"
+                  @delete="deleteTournament(tournament)"
+                  @click="$router.push('/tournaments/' + tournament.id)"
+                >
+                </Tournament>
+              </template>
+            </TabPanel>
+            <TabPanel header="Minulé">
+              <template v-for="tournament in tournaments">
+                <Tournament
+                  v-if="new Date(tournament.date) < new Date()"
+                  :id="tournament.id"
+                  :title="tournament.title"
+                  :date="tournament.date"
+                  :usersCount="tournament.users_count"
+                  @delete="deleteTournament(tournament)"
+                  @click="$router.push('/tournaments/' + tournament.id)"
+                >
+                </Tournament>
+              </template>
+            </TabPanel>
+          </TabView>
+        </template>
+        <template v-else>
+          <ProgressSpinner></ProgressSpinner>
+        </template>
       </template>
     </Card>
     <Dialog

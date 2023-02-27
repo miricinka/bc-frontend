@@ -6,6 +6,9 @@ import type { ChessboardAPI, BoardConfig } from "vue3-chessboard";
 import { Chess, type Move, type Square } from "chess.js";
 import axios from "axios";
 import type { IGame } from "@/shared/interface";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 interface Props {
   id?: string;
@@ -28,6 +31,7 @@ let chess = new Chess();
 const pgn = ref(
   "1. e4 e5 {king's pawn opening} 2. Nf3 Nc6 {aaa} 3. Bc4 Bc5 {giuoco piano} *"
 );
+const PGNError = ref<boolean>(false);
 
 onMounted(() => {
   if (props.id) {
@@ -115,7 +119,27 @@ function nextMove() {
 }
 
 function loadNewPgn(): void {
-  chess.loadPgn(pgn.value);
+  try {
+    chess.loadPgn(pgn.value);
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Chyba",
+      detail: "PGN se nepodařilo načíst",
+      life: 3000,
+    });
+    PGNError.value = true;
+    return;
+  }
+
+  toast.add({
+    severity: "success",
+    summary: "PGN",
+    detail: "Nové PGN načteno",
+    life: 3000,
+  });
+  PGNError.value = false;
+
   allComments = chess.getComments();
   history.value = chess.history({ verbose: true });
   max = history.value.length;
@@ -150,7 +174,16 @@ function loadNewPgn(): void {
             </Button>
             <Divider></Divider>
             <h5>PGN k přehrání</h5>
-            <Textarea id="load-pgn" type="text" cols="40" v-model="pgn" />
+            <Textarea
+              id="load-pgn"
+              type="text"
+              cols="40"
+              v-model="pgn"
+              :class="`${PGNError ? 'p-invalid' : ''}`"
+            />
+            <div v-if="PGNError">
+              <small id="pgn-error" class="p-error">Invalid PGN file.</small>
+            </div>
             <Button @click="loadNewPgn()">Nahrát</Button>
             <Divider></Divider>
             <div class="comment">

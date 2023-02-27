@@ -6,6 +6,7 @@ const visible = ref(false);
 </script>
 
 <template>
+  <Toast />
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
       <RouterLink to="/" class="navbar-brand" @click="visible = !visible"

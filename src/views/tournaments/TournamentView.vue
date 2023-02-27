@@ -3,6 +3,10 @@ import axios from "axios";
 import { onMounted, reactive, ref } from "vue";
 import type { ITournament, IUser } from "@/shared/interface";
 import router from "@/router";
+import { Chess } from "chess.js";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 interface Props {
   id: string;
@@ -28,7 +32,7 @@ onMounted(() => {
 
 const tournament = ref<ITournament>();
 const results = ref<GameResult[]>([]);
-results.value = [{ black: "user_2", white: "user_1", winner: "user_2" }];
+const PGNError = ref<boolean>(false);
 
 async function getTournament() {
   const response = await axios.get<ITournament>(
@@ -78,6 +82,8 @@ function openPGNModal(result: GameResult) {
 
 function closeModal() {
   displayModal.value = false;
+  PGNError.value = false;
+  form.pgn = "";
 }
 
 function hasPGN(result: GameResult): boolean {
@@ -104,16 +110,54 @@ function playPGN(result: GameResult) {
         entry.black == result.black && entry.white == result.white && entry.pgn
     );
   }
-  console.log(entry?.pgn);
   router.push({ name: "chess", params: { id: entry?.id } });
 }
 
 async function uploadPGN(black: string, white: string, pgn: string) {
-  await axios.put("http://127.0.0.1:8000/api/game", {
-    black: black,
-    white: white,
-    pgn: pgn,
-    tournament_id: tournament.value?.id,
+  if (!pgn || pgn === "") {
+    PGNError.value = true;
+    toast.add({
+      severity: "error",
+      summary: "PGN",
+      detail: "PGN nezadáno",
+      life: 3000,
+    });
+    return;
+  }
+  try {
+    const chess = new Chess();
+    chess.loadPgn(pgn);
+  } catch (e) {
+    toast.add({
+      severity: "error",
+      summary: "PGN",
+      detail: "Nevalidní PGN",
+      life: 3000,
+    });
+    PGNError.value = true;
+    return;
+  }
+
+  try {
+    await axios.put("http://127.0.0.1:8000/api/game", {
+      black: black,
+      white: white,
+      pgn: pgn,
+      tournament_id: tournament.value?.id,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "PGN",
+      detail: "PGN se nepodařilo nahrát",
+      life: 3000,
+    });
+  }
+  toast.add({
+    severity: "success",
+    summary: "PGN",
+    detail: "PGN nahráno!",
+    life: 3000,
   });
   getTournament();
   closeModal();
@@ -122,198 +166,211 @@ async function uploadPGN(black: string, white: string, pgn: string) {
 
 <template>
   <div class="container mt-5">
-    <Card class="tournament" v-if="tournament">
+    <Card class="tournament">
       <template #title>
-        <div class="d-flex justify-content-between container my-3">
-          {{ tournament.title }}
-          <span class="mx-2" v-if="tournament.users">
-            {{ tournament.users.length }}
-            <i class="pi pi-user" style="font-size: 1.2rem"></i>
-          </span>
-        </div>
-        <Divider align="left">
-          <div class="inline-flex align-items-center">
-            <b>{{ `${new Date(tournament.date).toLocaleDateString()}` }}</b>
+        <template v-if="tournament">
+          <div class="d-flex justify-content-between container my-3">
+            {{ tournament.title }}
+            <span class="mx-2" v-if="tournament.users">
+              {{ tournament.users.length }}
+              <i class="pi pi-user" style="font-size: 1.2rem"></i>
+            </span>
           </div>
-        </Divider>
+          <Divider align="left">
+            <div class="inline-flex align-items-center">
+              <b>{{ `${new Date(tournament.date).toLocaleDateString()}` }}</b>
+            </div>
+          </Divider>
+        </template>
       </template>
       <template #content>
-        <div class="container">
-          <p>{{ tournament.description }}</p>
-          <div v-if="tournament.users">
-            <table v-if="tournament.users.length > 0" class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col"></th>
-                  <th scope="col" v-for="user in tournament.users">
-                    <div class="d-flex flex-column">
+        <template v-if="tournament">
+          <div class="container tournament-table">
+            <p>{{ tournament.description }}</p>
+            <div v-if="tournament.users">
+              <table
+                v-if="tournament.users.length > 0"
+                class="table table-hover"
+              >
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    <th scope="col" v-for="user in tournament.users">
+                      <div class="d-flex flex-column">
+                        <span>
+                          {{ user.name + " " + user.surname }}
+                        </span>
+                      </div>
+                    </th>
+                    <th scope="col">Body</th>
+                    <th scope="col">Pořadí</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(user, iRow) in tournament.users">
+                    <th scope="row">
                       <span>
                         {{ user.name + " " + user.surname }}
                       </span>
-                    </div>
-                  </th>
-                  <th scope="col">Body</th>
-                  <th scope="col">Pořadí</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(user, iRow) in tournament.users">
-                  <th scope="row">
-                    <span>
-                      {{ user.name + " " + user.surname }}
-                    </span>
-                  </th>
-                  <td
-                    v-for="(userColumn, iCol) in tournament.users"
-                    :class="{
-                      'table-secondary': user.username === userColumn.username,
-                      'table-primary':
-                        (iCol < iRow && (iCol + iRow) % 2 === 1) ||
-                        (iCol > iRow && (iCol + iRow + 1) % 2 === 1),
-                    }"
-                  >
-                    <template v-if="user.username !== userColumn.username">
-                      <template
-                        v-if="
+                    </th>
+                    <td
+                      v-for="(userColumn, iCol) in tournament.users"
+                      :class="{
+                        'table-secondary':
+                          user.username === userColumn.username,
+                        'table-primary':
                           (iCol < iRow && (iCol + iRow) % 2 === 1) ||
-                          (iCol > iRow && (iCol + iRow + 1) % 2 === 1)
-                        "
-                      >
-                        <label for="tie">1</label>
-                        <Checkbox
-                          :value="{
-                            black: user.username,
-                            white: userColumn.username,
-                            winner: user.username,
-                          }"
-                          name="category"
-                          v-model="results"
-                          @change="
-                            checkboxChange(
-                              user.username,
-                              userColumn.username,
-                              user.username
-                            )
+                          (iCol > iRow && (iCol + iRow + 1) % 2 === 1),
+                      }"
+                    >
+                      <template v-if="user.username !== userColumn.username">
+                        <template
+                          v-if="
+                            (iCol < iRow && (iCol + iRow) % 2 === 1) ||
+                            (iCol > iRow && (iCol + iRow + 1) % 2 === 1)
                           "
-                        />
-                        <label for="tie">0</label>
-                        <Checkbox
-                          :value="{
-                            black: user.username,
-                            white: userColumn.username,
-                            winner: userColumn.username,
-                          }"
-                          name="category"
-                          v-model="results"
-                          @change="
-                            checkboxChange(
-                              user.username,
-                              userColumn.username,
-                              userColumn.username
-                            )
-                          "
-                        />
-                        <label for="tie">1/2</label>
-                        <Checkbox
-                          :value="{
-                            black: user.username,
-                            white: userColumn.username,
-                            winner: null,
-                          }"
-                          name="category"
-                          v-model="results"
-                          @change="
-                            checkboxChange(
-                              user.username,
-                              userColumn.username,
-                              null
-                            )
-                          "
-                        />
+                        >
+                          <label for="tie">1</label>
+                          <Checkbox
+                            :value="{
+                              black: user.username,
+                              white: userColumn.username,
+                              winner: user.username,
+                            }"
+                            name="category"
+                            v-model="results"
+                            @change="
+                              checkboxChange(
+                                user.username,
+                                userColumn.username,
+                                user.username
+                              )
+                            "
+                          />
+                          <label for="tie">0</label>
+                          <Checkbox
+                            :value="{
+                              black: user.username,
+                              white: userColumn.username,
+                              winner: userColumn.username,
+                            }"
+                            name="category"
+                            v-model="results"
+                            @change="
+                              checkboxChange(
+                                user.username,
+                                userColumn.username,
+                                userColumn.username
+                              )
+                            "
+                          />
+                          <label for="tie">1/2</label>
+                          <Checkbox
+                            :value="{
+                              black: user.username,
+                              white: userColumn.username,
+                              winner: null,
+                            }"
+                            name="category"
+                            v-model="results"
+                            @change="
+                              checkboxChange(
+                                user.username,
+                                userColumn.username,
+                                null
+                              )
+                            "
+                          />
+                        </template>
+                        <template v-else>
+                          <label for="tie">1</label>
+                          <Checkbox
+                            :value="{
+                              black: userColumn.username,
+                              white: user.username,
+                              winner: user.username,
+                            }"
+                            name="category"
+                            v-model="results"
+                            @change="
+                              checkboxChange(
+                                userColumn.username,
+                                user.username,
+                                user.username
+                              )
+                            "
+                          />
+                          <label for="tie">0</label>
+                          <Checkbox
+                            :value="{
+                              black: userColumn.username,
+                              white: user.username,
+                              winner: userColumn.username,
+                            }"
+                            name="category"
+                            v-model="results"
+                            @change="
+                              checkboxChange(
+                                userColumn.username,
+                                user.username,
+                                userColumn.username
+                              )
+                            "
+                          />
+                          <label for="tie">1/2</label>
+                          <Checkbox
+                            :value="{
+                              black: userColumn.username,
+                              white: user.username,
+                              winner: null,
+                            }"
+                            name="category"
+                            v-model="results"
+                            @change="
+                              checkboxChange(
+                                userColumn.username,
+                                user.username,
+                                null
+                              )
+                            "
+                          />
+                        </template>
                       </template>
-                      <template v-else>
-                        <label for="tie">1</label>
-                        <Checkbox
-                          :value="{
-                            black: userColumn.username,
-                            white: user.username,
-                            winner: user.username,
-                          }"
-                          name="category"
-                          v-model="results"
-                          @change="
-                            checkboxChange(
-                              userColumn.username,
-                              user.username,
-                              user.username
-                            )
-                          "
-                        />
-                        <label for="tie">0</label>
-                        <Checkbox
-                          :value="{
-                            black: userColumn.username,
-                            white: user.username,
-                            winner: userColumn.username,
-                          }"
-                          name="category"
-                          v-model="results"
-                          @change="
-                            checkboxChange(
-                              userColumn.username,
-                              user.username,
-                              userColumn.username
-                            )
-                          "
-                        />
-                        <label for="tie">1/2</label>
-                        <Checkbox
-                          :value="{
-                            black: userColumn.username,
-                            white: user.username,
-                            winner: null,
-                          }"
-                          name="category"
-                          v-model="results"
-                          @change="
-                            checkboxChange(
-                              userColumn.username,
-                              user.username,
-                              null
-                            )
-                          "
-                        />
-                      </template>
-                    </template>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <Divider></Divider>
-          <div class="games">
-            <h3>Jednotlivé partie</h3>
-            <template v-for="result in results">
-              <div>
-                <span> black: {{ result.black }}</span>
-                <span> white: {{ result.white }}</span>
-                <span> winner: {{ result.winner }}</span>
-                <Button
-                  label="Nahrát partii"
-                  icon="pi pi-check"
-                  @click="openPGNModal(result)"
-                ></Button>
-                <template v-if="hasPGN(result)">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <Divider></Divider>
+            <div class="games">
+              <h3>Jednotlivé partie</h3>
+              <template v-for="result in results">
+                <div>
+                  <span> black: {{ result.black }}</span>
+                  <span> white: {{ result.white }}</span>
+                  <span> winner: {{ result.winner }}</span>
                   <Button
-                    label="Přehrát partii"
-                    icon="pi pi-check"
-                    @click="playPGN(result)"
+                    label="Nahrát partii"
+                    icon="pi pi-plus"
+                    class="p-button-raised p-button-success"
+                    @click="openPGNModal(result)"
                   ></Button>
-                </template>
-              </div>
-            </template>
+                  <template v-if="hasPGN(result)">
+                    <Button
+                      label="Přehrát partii"
+                      icon="pi pi-play"
+                      class="p-button-raised"
+                      @click="playPGN(result)"
+                    ></Button>
+                  </template>
+                </div>
+              </template>
+            </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <ProgressSpinner></ProgressSpinner>
+        </template>
       </template>
     </Card>
     <Dialog
@@ -336,7 +393,11 @@ async function uploadPGN(black: string, white: string, pgn: string) {
             rows="5"
             cols="50"
             aria-labelledby="text-area-text"
+            :class="`${PGNError ? 'p-invalid' : ''}`"
           />
+          <div v-if="PGNError">
+            <small id="pgn-error" class="p-error">Invalid PGN file.</small>
+          </div>
         </div>
         <div>
           <Button
@@ -352,13 +413,13 @@ async function uploadPGN(black: string, white: string, pgn: string) {
   </div>
 </template>
 <style>
-table {
+div.tournament-table table {
   table-layout: fixed;
   word-wrap: break-word;
 }
 
-table th,
-table td {
+div.tournament-table table th,
+div.tournament-table table td {
   overflow: hidden;
 }
 </style>

@@ -4,7 +4,6 @@ interface Props {
   id: number;
   title: string;
   date: string;
-  description: string;
   usersCount: number;
 }
 const props = defineProps<Props>();

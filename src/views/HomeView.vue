@@ -3,6 +3,9 @@ import type News from "@/components/News.vue";
 import newsApi, { type INewsWithComment } from "@/api/news";
 import { onMounted, ref } from "vue";
 import type { PageState } from "primevue/paginator";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 const { news, getNews, destroyNews } = newsApi();
 const visibleNews = ref<INewsWithComment[]>([]);
@@ -17,7 +20,16 @@ onMounted(async () => {
 const deleteNews = async (id: number) => {
   console.log(id);
   await destroyNews(id);
+  toast.add({
+    severity: "success",
+    summary: "Article deleted",
+    detail: "Article deleted",
+    life: 3000,
+  });
   await getNews();
+  if (news.value) {
+    visibleNews.value = news.value.slice(0, 3);
+  }
 };
 
 function onPage(event: PageState) {
@@ -47,21 +59,26 @@ function onPage(event: PageState) {
                 </div>
               </template>
               <template #content>
-                <div v-for="oneNews in visibleNews">
-                  <News
-                    :id="oneNews.news.id"
-                    :title="oneNews.news.title"
-                    :text="oneNews.news.text"
-                    :dateCreated="oneNews.news.created_at"
-                    :commentCount="oneNews.commentCount"
-                    @delete="deleteNews"
-                  ></News>
+                <div v-if="visibleNews.length > 0">
+                  <div v-for="oneNews in visibleNews">
+                    <News
+                      :id="oneNews.news.id"
+                      :title="oneNews.news.title"
+                      :text="oneNews.news.text"
+                      :dateCreated="oneNews.news.created_at"
+                      :commentCount="oneNews.commentCount"
+                      @delete="deleteNews"
+                    ></News>
+                  </div>
+                  <Paginator
+                    :rows="3"
+                    :totalRecords="news?.length"
+                    @page="onPage($event)"
+                  ></Paginator>
                 </div>
-                <Paginator
-                  :rows="3"
-                  :totalRecords="news?.length"
-                  @page="onPage($event)"
-                ></Paginator>
+                <div v-else>
+                  <ProgressSpinner></ProgressSpinner>
+                </div>
               </template>
             </Card>
           </div>
@@ -72,10 +89,7 @@ function onPage(event: PageState) {
               <Card>
                 <template #title> Plán akcí </template>
                 <template #content>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Inventore sed consequuntur error repudiandae numquam deserunt
-                  quisquam repellat libero asperiores earum nam nobis, culpa
-                  ratione quam perferendis esse, cupiditate neque quas!
+                  <ProgressSpinner></ProgressSpinner>
                 </template>
               </Card>
             </div>
@@ -85,10 +99,7 @@ function onPage(event: PageState) {
               <Card>
                 <template #title> Novinky z okolí </template>
                 <template #content>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Inventore sed consequuntur error repudiandae numquam deserunt
-                  quisquam repellat libero asperiores earum nam nobis, culpa
-                  ratione quam perferendis esse, cupiditate neque quas!
+                  <ProgressSpinner></ProgressSpinner>
                 </template>
               </Card>
             </div>

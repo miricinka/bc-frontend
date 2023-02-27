@@ -6,6 +6,9 @@ import type {
 } from "@/shared/interface";
 import axios from "axios";
 import { onMounted, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 onMounted(() => {
   getAttendance();
@@ -33,6 +36,15 @@ const getAttendance = async () => {
 };
 
 async function submit() {
+  if (dates.value.length <= 0) {
+    toast.add({
+      severity: "error",
+      summary: "Datum",
+      detail: "Nebylo vybráno žádné datum",
+      life: 3000,
+    });
+    return;
+  }
   try {
     await axios.post(
       "http://127.0.0.1:8000/api/attendanceDay",
@@ -47,8 +59,20 @@ async function submit() {
     );
     getAttendance();
     closeModal();
-  } catch (error) {}
-  console.log(dates.value);
+    toast.add({
+      severity: "success",
+      summary: "Den docházky",
+      detail: "Den docházky přidán",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Den docházky",
+      detail: "Nepodařilo se vytvořit den docházky",
+      life: 3000,
+    });
+  }
   closeModal();
 }
 
@@ -80,7 +104,22 @@ async function deleteDay(date: IAttendanceDay) {
   if (!window.confirm("Opravdu tento den smazat?")) {
     return;
   }
-  await axios.delete("http://127.0.0.1:8000/api/attendance/" + date.id);
+  try {
+    await axios.delete("http://127.0.0.1:8000/api/attendance/" + date.id);
+    toast.add({
+      severity: "success",
+      summary: "Den docházky",
+      detail: "Den docházky smazán",
+      life: 3000,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Den docházky",
+      detail: "Nepodařilo se smazat den docházky",
+      life: 3000,
+    });
+  }
   await getAttendance();
 }
 </script>
@@ -100,43 +139,48 @@ async function deleteDay(date: IAttendanceDay) {
         </div>
       </template>
       <template #content>
-        <div class="scrollable">
-          <table v-if="table" class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col"></th>
-                <th scope="col" v-for="date in table.attendanceDays">
-                  <div class="d-flex flex-column">
-                    <span>
-                      {{ new Date(date.date).toLocaleDateString() }}
-                      <Button
-                        icon="pi pi-trash"
-                        class="p-button-danger p-button-sm"
-                        @click="deleteDay(date)"
-                      />
-                    </span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="student in table.users">
-                <th scope="row">{{ student.name }}</th>
-                <td v-for="date in table.attendanceDays">
-                  <Checkbox
-                    :value="{
-                      attendance_day_id: date.id,
-                      username: student.username,
-                    }"
-                    name="category"
-                    v-model="table.attendance"
-                    @click="checkboxChange(date, student)"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <template v-if="table">
+          <div class="scrollable">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col" v-for="date in table.attendanceDays">
+                    <div class="d-flex flex-column">
+                      <span>
+                        {{ new Date(date.date).toLocaleDateString() }}
+                        <Button
+                          icon="pi pi-trash"
+                          class="p-button-danger p-button-sm"
+                          @click="deleteDay(date)"
+                        />
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in table.users">
+                  <th scope="row">{{ student.name }}</th>
+                  <td v-for="date in table.attendanceDays">
+                    <Checkbox
+                      :value="{
+                        attendance_day_id: date.id,
+                        username: student.username,
+                      }"
+                      name="category"
+                      v-model="table.attendance"
+                      @click="checkboxChange(date, student)"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+        <template v-else>
+          <ProgressSpinner></ProgressSpinner>
+        </template>
       </template>
     </Card>
     <Dialog

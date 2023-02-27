@@ -94,6 +94,13 @@ const deleteComment = async (id: number) => {
         </template>
       </Card>
     </div>
+    <div v-else>
+      <Card class="news-card">
+        <template #content>
+          <ProgressSpinner></ProgressSpinner>
+        </template>
+      </Card>
+    </div>
 
     <div class="add-comment container mt-3">
       <Card class="add-comment-card">

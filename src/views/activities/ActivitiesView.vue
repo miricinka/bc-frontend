@@ -2,6 +2,9 @@
 import type { IActivity, IUser, IUserActivityTable } from "@/shared/interface";
 import axios, { AxiosError } from "axios";
 import { onMounted, reactive, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 onMounted(() => {
   getActivitiesUsers();
@@ -90,16 +93,44 @@ const store = async (data: {
 }) => {
   try {
     await axios.post("http://127.0.0.1:8000/api/activity", data);
+    toast.add({
+      severity: "success",
+      summary: "Aktivita",
+      detail: "Aktivita přidána",
+      life: 3000,
+    });
     await getActivitiesUsers();
     closeModal();
-  } catch (error) {}
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Aktivita",
+      detail: "Aktivitu se nepodařilo vytvořit",
+      life: 3000,
+    });
+  }
 };
 
 async function deleteActivity(activity: IActivity) {
   if (!window.confirm("Opravdu chcete aktivitu smazat?")) {
     return;
   }
-  await axios.delete("http://127.0.0.1:8000/api/activity/" + activity.name);
+  try {
+    await axios.delete("http://127.0.0.1:8000/api/activity/" + activity.name);
+    toast.add({
+      severity: "success",
+      summary: "Aktivita",
+      detail: "Aktivita smazána",
+      life: 3000,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Aktivita",
+      detail: "Aktivitu se nepodařilo smazat",
+      life: 3000,
+    });
+  }
   await getActivitiesUsers();
 }
 </script>
@@ -119,46 +150,62 @@ async function deleteActivity(activity: IActivity) {
         </div>
       </template>
       <template #content>
-        <div class="scrollable">
-          <table v-if="table" class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col"></th>
-                <th scope="col" v-for="activity in table.activities">
-                  <div class="d-flex flex-column">
-                    <span>
-                      {{ activity.name }}
-                      <Button
-                        icon="pi pi-trash"
-                        @click="deleteActivity(activity)"
-                        class="p-button-danger p-button-sm"
-                      />
-                    </span>
-                    <span> {{ activity.weight }} xp </span>
-                  </div>
-                </th>
-                <th scope="col">Celkem</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="student in table.users">
-                <th scope="row">{{ student.name }}</th>
-                <td v-for="activity in table.activities">
-                  <Checkbox
-                    :value="{
-                      activity: activity.name,
-                      username: student.username,
-                    }"
-                    name="category"
-                    v-model="table.done"
-                    @click="checkboxChange(activity, student)"
-                  />
-                </td>
-                <td>{{ countPoints(student) }} xp</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <template v-if="table">
+          <div class="activities-scrollable">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col" v-for="activity in table.activities">
+                    <div class="d-flex flex-column">
+                      <span>
+                        {{ activity.name }}
+                        <Button
+                          icon="pi pi-trash"
+                          @click="deleteActivity(activity)"
+                          class="p-button-danger p-button-sm"
+                        />
+                        <Button
+                          v-tooltip.top.focus="
+                            `${
+                              activity.description
+                                ? activity.description
+                                : 'Žádný popis'
+                            }`
+                          "
+                          icon="pi pi-question-circle"
+                          class="p-button-sm"
+                        />
+                      </span>
+                      <span> {{ activity.weight }} xp </span>
+                    </div>
+                  </th>
+                  <th scope="col">Celkem</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in table.users">
+                  <th scope="row">{{ student.name }}</th>
+                  <td v-for="activity in table.activities">
+                    <Checkbox
+                      :value="{
+                        activity: activity.name,
+                        username: student.username,
+                      }"
+                      name="category"
+                      v-model="table.done"
+                      @click="checkboxChange(activity, student)"
+                    />
+                  </td>
+                  <td>{{ countPoints(student) }} xp</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+        <template v-else>
+          <ProgressSpinner></ProgressSpinner>
+        </template>
       </template>
     </Card>
     <Dialog
@@ -207,17 +254,17 @@ async function deleteActivity(activity: IActivity) {
 </template>
 
 <style>
-table {
+div.activities-scrollable table {
   table-layout: fixed;
   word-wrap: break-word;
 }
 
-table th,
+div.activities-scrollable table th,
 table td {
   overflow: hidden;
 }
 
-.scrollable {
+.activities-scrollable {
   overflow-x: auto;
 }
 </style>
