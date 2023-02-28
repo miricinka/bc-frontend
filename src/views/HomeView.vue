@@ -4,17 +4,21 @@ import newsApi, { type INewsWithComment } from "@/api/news";
 import { onMounted, ref } from "vue";
 import type { PageState } from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
+import axios from "axios";
+import type { IEvent } from "@/shared/interface";
 
 const toast = useToast();
 
 const { news, getNews, destroyNews } = newsApi();
 const visibleNews = ref<INewsWithComment[]>([]);
+const events = ref<IEvent[]>();
 
 onMounted(async () => {
   await getNews();
   if (news.value) {
     visibleNews.value = news.value.slice(0, 3);
   }
+  await getEvents();
 });
 
 const deleteNews = async (id: number) => {
@@ -37,6 +41,36 @@ function onPage(event: PageState) {
   if (news.value) {
     visibleNews.value = news.value.slice(event.first, event.first + event.rows);
   }
+}
+
+function onEventPage(event: PageState) {
+  console.log(event);
+}
+
+async function getEvents() {
+  const response = await axios.get<IEvent[]>("http://127.0.0.1:8000/api/event");
+  events.value = response.data;
+}
+
+async function deleteEvent(id: number) {
+  try {
+    await axios.delete("http://127.0.0.1:8000/api/event/" + id);
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Akce",
+      detail: "Akci se nepodařilo smazat",
+      life: 3000,
+    });
+    return;
+  }
+  toast.add({
+    severity: "success",
+    summary: "Akce",
+    detail: "Akce smazána",
+    life: 3000,
+  });
+  await getEvents();
 }
 </script>
 
@@ -87,9 +121,36 @@ function onPage(event: PageState) {
           <div class="row pb-2">
             <div class="news mt-5">
               <Card>
-                <template #title> Plán akcí </template>
+                <template #title>
+                  <div class="d-flex justify-content-between container my-3">
+                    Kalendář akcí
+                    <Button
+                      label="Nová akce"
+                      class="p-button-raised p-button-success"
+                      icon="pi pi-plus"
+                    />
+                  </div>
+                </template>
                 <template #content>
-                  <ProgressSpinner></ProgressSpinner>
+                  <template v-if="events">
+                    <template v-if="events.length === 0"> Zadne akce </template>
+                    <div class="events">
+                      <Event
+                        v-for="event in events"
+                        :name="event.name"
+                        :date="event.date"
+                        :description="event.description"
+                        @delete="deleteEvent(event.id)"
+                      ></Event>
+                      <Paginator
+                        :rows="3"
+                        @page="onEventPage($event)"
+                      ></Paginator>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <ProgressSpinner></ProgressSpinner>
+                  </template>
                 </template>
               </Card>
             </div>

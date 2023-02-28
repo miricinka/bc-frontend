@@ -38,6 +38,7 @@ import Tooltip from "primevue/tooltip";
 import News from "./components/News.vue";
 import Comment from "./components/Comment.vue";
 import Tournament from "./components/Tournament.vue";
+import Event from "./components/Event.vue";
 
 const app = createApp(App);
 
@@ -68,5 +69,6 @@ app.directive("tooltip", Tooltip);
 app.component("News", News);
 app.component("Comment", Comment);
 app.component("Tournament", Tournament);
+app.component("Event", Event);
 
 app.mount("#app");

@@ -63,3 +63,10 @@ export interface INews {
   title: string;
   text: string;
 }
+
+export interface IEvent {
+  id: number;
+  name: string;
+  date: string;
+  description: string;
+}
