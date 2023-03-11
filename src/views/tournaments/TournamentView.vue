@@ -35,6 +35,10 @@ const tournament = ref<ITournament>();
 const results = ref<GameResult[]>([]);
 const PGNError = ref<boolean>(false);
 
+/*
+  gets tournament from the server
+  loads it to internal variable
+*/
 async function getTournament() {
   const response = await axios.get<ITournament>(
     "http://127.0.0.1:8000/api/tournament/" + props.id
@@ -46,6 +50,11 @@ async function getTournament() {
   });
 }
 
+/*
+  reacts to change in checkbox, 
+  sends the changed value to server
+  triggers success/error notification
+*/
 async function checkboxChange(
   black: string,
   white: string,
@@ -85,18 +94,27 @@ function getUser(username: string): IUser | null {
   return null;
 }
 
+/*
+  opens modal
+*/
 function openPGNModal(result: GameResult) {
   form.black = result.black;
   form.white = result.white;
   displayModal.value = true;
 }
 
+/*
+  closes modal, resets form
+ */
 function closeModal() {
   displayModal.value = false;
   PGNError.value = false;
   form.pgn = "";
 }
 
+/*
+  checks if this game has some pgn in order to show play button
+*/
 function hasPGN(result: GameResult): boolean {
   if (tournament.value) {
     if (
@@ -113,6 +131,10 @@ function hasPGN(result: GameResult): boolean {
   return false;
 }
 
+/*
+  redirects to Chess screen and gives the game id as input param,
+  so the screen can first init the game with this pgn
+*/
 function playPGN(result: GameResult) {
   let entry;
   if (tournament.value) {
@@ -124,6 +146,9 @@ function playPGN(result: GameResult) {
   router.push({ name: "chess", params: { id: entry?.id } });
 }
 
+/*
+  uploads pgn, but first it checks if its valid pgn
+*/
 async function uploadPGN(black: string, white: string, pgn: string) {
   if (!pgn || pgn === "") {
     PGNError.value = true;
@@ -173,6 +198,36 @@ async function uploadPGN(black: string, white: string, pgn: string) {
   });
   getTournament();
   closeModal();
+}
+
+/*
+  Calculates gained points for user 
+*/
+function calculatePoints(user: IUser): number {
+  const games = results.value;
+
+  if (!games) return 0;
+
+  const wonGames = games.filter((g) => g.winner === user.username).length;
+  const tieGames = games.filter(
+    (g) => g.winner === null && [g.black, g.white].includes(user.username)
+  ).length;
+
+  return wonGames + tieGames / 2;
+}
+
+/*
+  Calculates rank for user by his gained points
+*/
+function calculateRank(user: IUser) {
+  const users = tournament.value?.users;
+  if (!users) return;
+
+  const sortedUsers = users
+    .map((u) => ({ user: u.username, points: calculatePoints(u) }))
+    .sort((a, b) => b.points - a.points);
+
+  return sortedUsers.findIndex((u) => u.user === user.username) + 1;
 }
 </script>
 
@@ -349,15 +404,19 @@ async function uploadPGN(black: string, white: string, pgn: string) {
                         </template>
                       </template>
                     </td>
-                    <td>body</td>
-                    <td>poradi</td>
+                    <td>{{ calculatePoints(user) }}</td>
+                    <td>
+                      {{ calculateRank(user) }}.<i
+                        class="pi pi-star"
+                        v-if="calculateRank(user) === 1"
+                      ></i>
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <Divider></Divider>
-            <div class="games">
-              <h3>Jednotlivé partie</h3>
+            <div class="games mt-5" v-if="tournament.games.length > 0">
+              <h4>Jednotlivé partie</h4>
               <div class="skeleton" v-if="showSkeleton">
                 <Skeleton width="40rem" class="mb-3"></Skeleton>
                 <Skeleton width="38rem" class="mb-3"></Skeleton>
@@ -465,5 +524,10 @@ div.tournament-table table {
 div.tournament-table table th,
 div.tournament-table table td {
   overflow: hidden;
+}
+
+div.games h4 {
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 </style>
