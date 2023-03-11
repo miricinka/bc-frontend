@@ -40,6 +40,9 @@ import Comment from "./components/Comment.vue";
 import Tournament from "./components/Tournament.vue";
 import Event from "./components/Event.vue";
 
+import CardLoading from "./components/CardLoading.vue";
+import TableLoading from "./components/TableLoading.vue";
+
 const app = createApp(App);
 
 app.use(router);
@@ -70,5 +73,8 @@ app.component("News", News);
 app.component("Comment", Comment);
 app.component("Tournament", Tournament);
 app.component("Event", Event);
+
+app.component("CardLoading", CardLoading);
+app.component("TableLoading", TableLoading);
 
 app.mount("#app");

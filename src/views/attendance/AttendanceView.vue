@@ -179,7 +179,7 @@ async function deleteDay(date: IAttendanceDay) {
           </div>
         </template>
         <template v-else>
-          <ProgressSpinner></ProgressSpinner>
+          <TableLoading></TableLoading>
         </template>
       </template>
     </Card>

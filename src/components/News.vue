@@ -13,6 +13,9 @@ const props = defineProps<Props>();
 <template>
   <div class="container my-3">
     <Card class="news-card">
+      <template #header>
+        <div class="card-top-color"></div>
+      </template>
       <template #title>
         {{ title }}
         <Divider align="right">
@@ -59,5 +62,11 @@ const props = defineProps<Props>();
 <style>
 .news-card {
   border-radius: 25px;
+}
+.card-top-color {
+  height: 20px;
+  border-top-right-radius: 25px;
+  border-top-left-radius: 25px;
+  background-image: linear-gradient(to right, #ffc107, #fdf0cb);
 }
 </style>

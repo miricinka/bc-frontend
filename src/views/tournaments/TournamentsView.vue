@@ -131,7 +131,8 @@ async function deleteTournament(tournament: ITournament) {
           </TabView>
         </template>
         <template v-else>
-          <ProgressSpinner></ProgressSpinner>
+          <CardLoading></CardLoading>
+          <CardLoading></CardLoading>
         </template>
       </template>
     </Card>

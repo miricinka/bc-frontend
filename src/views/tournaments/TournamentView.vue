@@ -163,6 +163,7 @@ async function uploadPGN(black: string, white: string, pgn: string) {
       detail: "PGN se nepodařilo nahrát",
       life: 3000,
     });
+    return;
   }
   toast.add({
     severity: "success",
@@ -348,6 +349,8 @@ async function uploadPGN(black: string, white: string, pgn: string) {
                         </template>
                       </template>
                     </td>
+                    <td>body</td>
+                    <td>poradi</td>
                   </tr>
                 </tbody>
               </table>
@@ -361,28 +364,50 @@ async function uploadPGN(black: string, white: string, pgn: string) {
                 <Skeleton width="40rem" class="mb-3"></Skeleton>
                 <Skeleton width="38rem" class="mb-3"></Skeleton>
               </div>
-              <div v-else>
-                <template v-for="result in results">
-                  <div class="result">
-                    <span> black: {{ result.black }}</span>
-                    <span> white: {{ result.white }}</span>
-                    <span> winner: {{ result.winner }}</span>
-                    <Button
-                      label="Nahrát partii"
-                      icon="pi pi-plus"
-                      class="p-button-raised p-button-success"
-                      @click="openPGNModal(result)"
-                    ></Button>
-                    <template v-if="hasPGN(result)">
-                      <Button
-                        label="Přehrát partii"
-                        icon="pi pi-play"
-                        class="p-button-raised"
-                        @click="playPGN(result)"
-                      ></Button>
-                    </template>
-                  </div>
-                </template>
+              <div v-else class="results-table">
+                <div class="container">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">
+                          <i class="pi pi-circle-fill"></i> Černý
+                        </th>
+                        <th scope="col"><i class="pi pi-circle"></i> Bílý</th>
+                        <th scope="col"><i class="pi pi-star"></i> Vítěz</th>
+                        <th scope="col"><i class="pi pi-file"></i>Partie</th>
+                        <th scope="col"><i class="pi pi-star"></i></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(result, index) in results">
+                        <th scope="row">{{ index }}</th>
+                        <td>{{ result.black }}</td>
+                        <td>{{ result.white }}</td>
+                        <td>{{ result.winner }}</td>
+                        <td>
+                          <template v-if="hasPGN(result)">
+                            <Button
+                              label="Přehrát partii"
+                              icon="pi pi-play"
+                              class="p-button-raised"
+                              @click="playPGN(result)"
+                            ></Button>
+                          </template>
+                        </td>
+                        <td>
+                          <Button
+                            label="Nahrát partii"
+                            icon="pi pi-plus"
+                            size="small"
+                            class="p-button-raised p-button-success"
+                            @click="openPGNModal(result)"
+                          ></Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

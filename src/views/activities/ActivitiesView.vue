@@ -204,7 +204,7 @@ async function deleteActivity(activity: IActivity) {
           </div>
         </template>
         <template v-else>
-          <ProgressSpinner></ProgressSpinner>
+          <TableLoading></TableLoading>
         </template>
       </template>
     </Card>

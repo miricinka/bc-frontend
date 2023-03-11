@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const emit = defineEmits(["delete", "edit"]);
 interface Props {
-  name: number;
+  name: string;
   description: string;
   date: string;
 }
@@ -26,6 +26,7 @@ const props = defineProps<Props>();
             <Button
               class="p-button-raised mx-1 p-button-rounded"
               icon="pi pi-file-edit"
+              @click="$emit('edit')"
             />
             <Button
               class="p-button-raised p-button-danger mx-1 p-button-rounded"
@@ -41,6 +42,8 @@ const props = defineProps<Props>();
 
 <style>
 .card-left-color {
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
   background-color: #ffc107;
 }
 </style>
