@@ -70,3 +70,11 @@ export interface IEvent {
   date: string;
   description: string;
 }
+
+export interface IToken {
+  token: string;
+}
+
+export interface ILoginResponse {
+  data: IToken;
+}

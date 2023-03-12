@@ -65,7 +65,14 @@ const visible = ref(false);
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <span class="nav-link">Login</span>
+            <span class="nav-link"
+              ><RouterLink
+                to="/login"
+                class="nav-link"
+                @click="visible = !visible"
+                >Login</RouterLink
+              ></span
+            >
           </li>
         </ul>
       </div>
