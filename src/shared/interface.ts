@@ -73,6 +73,7 @@ export interface IEvent {
 
 export interface IToken {
   token: string;
+  username: string;
 }
 
 export interface ILoginResponse {
