@@ -5,6 +5,7 @@ interface Props {
   title: string;
   date: string;
   usersCount: number;
+  role: string;
 }
 const props = defineProps<Props>();
 </script>
@@ -32,6 +33,7 @@ const props = defineProps<Props>();
                   class="p-button-raised p-button"
                 ></Button>
                 <Button
+                  v-if="role === 'admin'"
                   label="Smazat"
                   icon="pi pi-trash"
                   class="p-button-raised p-button-danger"

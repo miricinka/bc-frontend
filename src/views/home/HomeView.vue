@@ -8,6 +8,7 @@ import axios from "axios";
 import type { IEvent } from "@/shared/interface";
 
 const toast = useToast();
+const loggedRole = ref(localStorage.getItem("role"));
 
 const { news, getNews } = newsApi();
 const visibleNews = ref<INewsWithComment[]>([]);
@@ -264,6 +265,7 @@ async function updateEvent(name: string, date: Date, description: string) {
                 <div class="d-flex justify-content-between container my-3">
                   Aktuality
                   <Button
+                    v-if="loggedRole === 'admin'"
                     @click="$router.push('/createNews')"
                     label="Nová aktualita"
                     class="p-button-raised p-button-success"
@@ -280,6 +282,7 @@ async function updateEvent(name: string, date: Date, description: string) {
                       :text="oneNews.news.text"
                       :dateCreated="oneNews.news.created_at"
                       :commentCount="oneNews.commentCount"
+                      :role="loggedRole"
                       @delete="deleteNews"
                     ></News>
                   </div>
@@ -306,6 +309,7 @@ async function updateEvent(name: string, date: Date, description: string) {
                   <div class="d-flex justify-content-between container my-3">
                     Kalendář akcí
                     <Button
+                      v-if="loggedRole === 'admin'"
                       label="Nová akce"
                       class="p-button-raised p-button-success"
                       icon="pi pi-plus"
@@ -322,6 +326,7 @@ async function updateEvent(name: string, date: Date, description: string) {
                         :name="event.name"
                         :date="event.date"
                         :description="event.description"
+                        :role="loggedRole"
                         @edit="openEditEventModal(event.id)"
                         @delete="deleteEvent(event.id)"
                       ></Event>

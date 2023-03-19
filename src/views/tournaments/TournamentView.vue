@@ -7,6 +7,7 @@ import { Chess } from "chess.js";
 import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
+const loggedRole = ref(localStorage.getItem("role"));
 
 interface Props {
   id: string;
@@ -435,7 +436,9 @@ function calculateRank(user: IUser) {
                         <th scope="col"><i class="pi pi-circle"></i> Bílý</th>
                         <th scope="col"><i class="pi pi-star"></i> Vítěz</th>
                         <th scope="col"><i class="pi pi-file"></i>Partie</th>
-                        <th scope="col"><i class="pi pi-star"></i></th>
+                        <th scope="col" v-if="loggedRole === 'admin'">
+                          <i class="pi pi-star"></i>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -454,7 +457,7 @@ function calculateRank(user: IUser) {
                             ></Button>
                           </template>
                         </td>
-                        <td>
+                        <td v-if="loggedRole === 'admin'">
                           <Button
                             label="Nahrát partii"
                             icon="pi pi-plus"

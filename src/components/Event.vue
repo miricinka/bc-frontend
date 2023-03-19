@@ -4,6 +4,7 @@ interface Props {
   name: string;
   description: string;
   date: string;
+  role: string;
 }
 const props = defineProps<Props>();
 </script>
@@ -22,7 +23,7 @@ const props = defineProps<Props>();
           <p class="card-text">
             {{ description }}
           </p>
-          <div class="d-flex justify-content-end">
+          <div class="d-flex justify-content-end" v-if="role === 'admin'">
             <Button
               class="p-button-raised mx-1 p-button-rounded"
               icon="pi pi-file-edit"

@@ -2,6 +2,11 @@
 import type { IComment, IStoreCommentError, News } from "@/api/news";
 import axios, { AxiosError } from "axios";
 import { onMounted, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
+const loggedRole = ref(localStorage.getItem("role"));
+const loggedUsername = ref(localStorage.getItem("username"));
 
 interface Props {
   id: string;
@@ -36,6 +41,7 @@ const getComments = async (id: string) => {
 const addComment = async (comment: string) => {
   try {
     await axios.post("http://127.0.0.1:8000/api/news/comments", {
+      username: loggedUsername.value,
       text: comment,
       news_id: props.id,
     });
@@ -77,7 +83,7 @@ const deleteComment = async (id: number) => {
         <template #content> {{ news.text }} </template>
         <template #footer>
           <div class="d-flex justify-content-between">
-            <div>
+            <div v-if="loggedRole === 'admin'">
               <Button
                 label="Editovat"
                 class="p-button-raised mx-1"
@@ -97,12 +103,12 @@ const deleteComment = async (id: number) => {
     <div v-else>
       <Card class="news-card">
         <template #content>
-          <ProgressSpinner></ProgressSpinner>
+          <CardLoading></CardLoading>
         </template>
       </Card>
     </div>
 
-    <div class="add-comment container mt-3">
+    <div class="add-comment container mt-3" v-if="loggedRole">
       <Card class="add-comment-card">
         <template #title> Nový komentář </template>
         <template #content>
@@ -138,6 +144,10 @@ const deleteComment = async (id: number) => {
           :id="comment.id"
           :text="comment.text"
           :dateCreated="comment.created_at"
+          :username="comment.username"
+          :showButtons="
+            comment.username === loggedUsername || loggedRole === 'admin'
+          "
           @delete="deleteComment"
           @reload="getComments(props.id)"
         ></Comment>

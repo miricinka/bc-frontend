@@ -5,6 +5,7 @@ import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
+const loggedRole = ref(localStorage.getItem("role"));
 
 onMounted(() => {
   getTournaments();
@@ -77,6 +78,7 @@ async function deleteTournament(tournament: ITournament) {
         <div class="d-flex justify-content-between container my-3">
           Turnaje
           <Button
+            v-if="loggedRole === 'admin'"
             label="Založit turnaj"
             icon="pi pi-plus"
             class="p-button-raised p-button-success"
@@ -94,6 +96,7 @@ async function deleteTournament(tournament: ITournament) {
                   :title="tournament.title"
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
+                  :role="loggedRole"
                   @delete="deleteTournament(tournament)"
                   @click="$router.push('/tournaments/' + tournament.id)"
                 >
@@ -108,6 +111,7 @@ async function deleteTournament(tournament: ITournament) {
                   :title="tournament.title"
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
+                  :role="loggedRole"
                   @delete="deleteTournament(tournament)"
                   @click="$router.push('/tournaments/' + tournament.id)"
                 >
@@ -122,6 +126,7 @@ async function deleteTournament(tournament: ITournament) {
                   :title="tournament.title"
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
+                  :role="loggedRole"
                   @delete="deleteTournament(tournament)"
                   @click="$router.push('/tournaments/' + tournament.id)"
                 >

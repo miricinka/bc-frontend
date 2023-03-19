@@ -8,6 +8,8 @@ interface Props {
   id: number;
   text: string;
   dateCreated: string;
+  username: string;
+  showButtons: boolean;
 }
 const props = defineProps<Props>();
 
@@ -55,7 +57,7 @@ async function editComment(text: string) {
       </template>
       <template #footer>
         <div class="d-flex justify-content-end">
-          <div>
+          <div v-if="showButtons">
             <Button
               label="Editovat"
               class="p-button-raised mx-1"

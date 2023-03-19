@@ -6,6 +6,7 @@ interface Props {
   text: string;
   dateCreated: string;
   commentCount: number;
+  role: string;
 }
 const props = defineProps<Props>();
 </script>
@@ -39,7 +40,7 @@ const props = defineProps<Props>();
               @click="$router.push({ path: `/news/${id}` })"
             />
           </div>
-          <div>
+          <div v-if="role === 'admin'">
             <Button
               label="Editovat"
               class="p-button-raised mx-1"

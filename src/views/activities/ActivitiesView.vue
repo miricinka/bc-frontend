@@ -5,6 +5,7 @@ import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
+const loggedRole = ref(localStorage.getItem("role"));
 
 onMounted(() => {
   getActivitiesUsers();
@@ -142,6 +143,7 @@ async function deleteActivity(activity: IActivity) {
         <div class="d-flex justify-content-between container my-3">
           Aktivity
           <Button
+            v-if="loggedRole === 'admin'"
             label="Přidat aktualitu"
             icon="pi pi-plus"
             class="p-button-raised p-button-success"
@@ -161,6 +163,7 @@ async function deleteActivity(activity: IActivity) {
                       <span>
                         {{ activity.name }}
                         <Button
+                          v-if="loggedRole === 'admin'"
                           icon="pi pi-trash"
                           @click="deleteActivity(activity)"
                           class="p-button-danger p-button-sm"

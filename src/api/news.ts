@@ -16,6 +16,7 @@ export interface IComment {
   updated_at: string;
   text: string;
   news_id: number;
+  username: string;
 }
 
 export interface IStoreNewsError {

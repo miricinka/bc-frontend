@@ -14,9 +14,7 @@ const loginError = ref<boolean>(false);
 
 const token = ref(localStorage.getItem("token"));
 const loggedUsername = ref(localStorage.getItem("username"));
-
-console.log(token.value);
-console.log(loggedUsername.value);
+const loggedRole = ref(localStorage.getItem("role"));
 
 const loginForm = reactive({
   email: "",
@@ -37,17 +35,17 @@ async function login(data: { email: string; password: string }) {
     //setting token and username to local browser storage
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("username", response.data.username);
+    localStorage.setItem("role", response.data.role);
     token.value = localStorage.getItem("token");
     loggedUsername.value = localStorage.getItem("username");
-    console.log(token.value);
-    console.log(loggedUsername.value);
+    loggedRole.value = localStorage.getItem("role");
     toast.add({
       severity: "success",
       summary: "Vítejte!",
       life: 3000,
     });
     displayModal.value = false;
-    router.push("/");
+    router.go(0);
   } catch (error) {
     loginError.value = true;
     toast.add({
@@ -70,14 +68,16 @@ async function logout() {
     });
     localStorage.removeItem("token");
     localStorage.removeItem("username");
+    localStorage.removeItem("role");
     loggedUsername.value = null;
+    loggedRole.value = null;
     token.value = null;
     toast.add({
       severity: "success",
       summary: "Úspěšně odhlášeno",
       life: 3000,
     });
-    router.push("/");
+    router.go(0);
   } catch (error) {
     toast.add({
       severity: "error",

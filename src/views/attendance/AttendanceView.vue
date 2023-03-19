@@ -9,6 +9,7 @@ import { onMounted, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
+const loggedRole = ref(localStorage.getItem("role"));
 
 onMounted(() => {
   getAttendance();
@@ -131,6 +132,7 @@ async function deleteDay(date: IAttendanceDay) {
         <div class="d-flex justify-content-between container my-3">
           Docházka
           <Button
+            v-if="loggedRole === 'admin'"
             label="Přidat den/dny"
             icon="pi pi-plus"
             class="p-button-raised p-button-success"
@@ -150,6 +152,7 @@ async function deleteDay(date: IAttendanceDay) {
                       <span>
                         {{ new Date(date.date).toLocaleDateString() }}
                         <Button
+                          v-if="loggedRole === 'admin'"
                           icon="pi pi-trash"
                           class="p-button-danger p-button-sm"
                           @click="deleteDay(date)"
