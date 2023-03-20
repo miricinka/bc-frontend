@@ -1,11 +1,13 @@
 <script setup lang="ts">
-const emit = defineEmits(["delete"]);
+const emit = defineEmits(["delete", "sign", "unsign", "detail"]);
 interface Props {
   id: number;
   title: string;
   date: string;
   usersCount: number;
   role: string;
+  showButtons: boolean;
+  isSigned: boolean;
 }
 const props = defineProps<Props>();
 </script>
@@ -16,22 +18,32 @@ const props = defineProps<Props>();
         <table class="table table-borderless">
           <tbody>
             <tr class="d-flex align-items-center">
-              <th>{{ `${new Date(date).toLocaleDateString()}` }}</th>
-              <td>{{ title }}</td>
+              <div class="click p-3 flex" @click="$emit('detail')">
+                <th class="mr-5">
+                  {{ `${new Date(date).toLocaleDateString()}` }}
+                </th>
+                <td>{{ title }}</td>
+              </div>
               <td class="actions d-flex ml-auto align-items-center">
                 <span class="mx-5"
                   >{{ usersCount }} <i class="pi pi-user"></i
                 ></span>
-                <Button
-                  label="Přihlásit se"
-                  icon="pi pi-plus"
-                  class="p-button-raised p-button-success"
-                ></Button>
-                <Button
-                  label="Odhlásit se"
-                  icon="pi pi-minus"
-                  class="p-button-raised p-button"
-                ></Button>
+                <template v-if="showButtons">
+                  <Button
+                    v-if="isSigned"
+                    label="Odhlásit se"
+                    icon="pi pi-minus"
+                    class="p-button-raised p-button"
+                    @click="$emit('unsign')"
+                  ></Button>
+                  <Button
+                    v-else
+                    label="Přihlásit se"
+                    icon="pi pi-plus"
+                    class="p-button-raised p-button-success"
+                    @click="$emit('sign')"
+                  ></Button>
+                </template>
                 <Button
                   v-if="role === 'admin'"
                   label="Smazat"
@@ -57,7 +69,7 @@ table {
   margin: 2px;
 }
 
-.tournament-card {
+.tournament-card div.click {
   cursor: pointer;
 }
 </style>

@@ -6,6 +6,8 @@ import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
+const loggedUsername = ref(localStorage.getItem("username"));
+console.log(loggedUsername.value);
 
 onMounted(() => {
   getTournaments();
@@ -54,6 +56,7 @@ async function submit(data: { title: string; date: any; description: string }) {
       detail: "Turnament se nepodařilo vyvořit",
       life: 3000,
     });
+    return;
   }
   toast.add({
     severity: "success",
@@ -68,6 +71,57 @@ async function deleteTournament(tournament: ITournament) {
     return;
   }
   await axios.delete("http://127.0.0.1:8000/api/tournament/" + tournament.id);
+  toast.add({
+    severity: "success",
+    summary: "Zápas smazán",
+    life: 3000,
+  });
+  await getTournaments();
+}
+
+async function signUser(tournamentId: number) {
+  try {
+    await axios.post(
+      "http://127.0.0.1:8000/api/tournament/" + String(tournamentId) + "/user",
+      { username: loggedUsername.value }
+    );
+    toast.add({
+      severity: "success",
+      summary: "Přihlášen",
+      life: 3000,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Přihlášení",
+      detail: "Nepodařilo se přihlásit",
+      life: 3000,
+    });
+    return;
+  }
+  await getTournaments();
+}
+
+async function unsignUser(tournamentId: number) {
+  try {
+    await axios.delete(
+      "http://127.0.0.1:8000/api/tournament/" + String(tournamentId) + "/user",
+      { data: { username: loggedUsername.value } }
+    );
+    toast.add({
+      severity: "success",
+      summary: "Odlášen",
+      life: 3000,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Přihlášení",
+      detail: "Nepodařilo se odhlásit",
+      life: 3000,
+    });
+    return;
+  }
   await getTournaments();
 }
 </script>
@@ -97,8 +151,16 @@ async function deleteTournament(tournament: ITournament) {
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
                   :role="loggedRole"
+                  :showButtons="new Date(tournament.date) >= new Date()"
+                  :isSigned="
+                    tournament.users?.some(
+                      (user) => user.username === loggedUsername
+                    )
+                  "
+                  @sign="signUser(tournament.id)"
+                  @unsign="unsignUser(tournament.id)"
                   @delete="deleteTournament(tournament)"
-                  @click="$router.push('/tournaments/' + tournament.id)"
+                  @detail="$router.push('/tournaments/' + tournament.id)"
                 >
                 </Tournament>
               </template>
@@ -112,8 +174,16 @@ async function deleteTournament(tournament: ITournament) {
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
                   :role="loggedRole"
+                  :showButtons="true"
+                  :isSigned="
+                    tournament.users?.some(
+                      (user) => user.username === loggedUsername
+                    )
+                  "
                   @delete="deleteTournament(tournament)"
-                  @click="$router.push('/tournaments/' + tournament.id)"
+                  @sign="signUser(tournament.id)"
+                  @unsign="unsignUser(tournament.id)"
+                  @detail="$router.push('/tournaments/' + tournament.id)"
                 >
                 </Tournament>
               </template>
@@ -122,13 +192,21 @@ async function deleteTournament(tournament: ITournament) {
               <template v-for="tournament in tournaments">
                 <Tournament
                   v-if="new Date(tournament.date) < new Date()"
+                  :showButtons="false"
                   :id="tournament.id"
                   :title="tournament.title"
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
                   :role="loggedRole"
+                  :isSigned="
+                    tournament.users?.some(
+                      (user) => user.username === loggedUsername
+                    )
+                  "
+                  @sign="signUser(tournament.id)"
+                  @unsign="unsignUser(tournament.id)"
                   @delete="deleteTournament(tournament)"
-                  @click="$router.push('/tournaments/' + tournament.id)"
+                  @detail="$router.push('/tournaments/' + tournament.id)"
                 >
                 </Tournament>
               </template>
