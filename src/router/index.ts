@@ -59,6 +59,17 @@ const router = createRouter({
       props: true,
     },
     {
+      path: "/users",
+      name: "users",
+      component: () => import("../views/users/UsersView.vue"),
+    },
+    {
+      path: "/users/:username",
+      name: "user",
+      component: () => import("../views/user/OneUserView.vue"),
+      props: true,
+    },
+    {
       path: "/pageNotFound",
       name: "pageNotFound",
       component: () => import("../views/other/PageNotFound.vue"),

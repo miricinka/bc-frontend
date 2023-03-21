@@ -147,12 +147,23 @@ async function logout() {
               >Turnaje</RouterLink
             >
           </li>
+          <li class="nav-item" v-if="loggedRole === 'admin'">
+            <RouterLink to="/users" class="nav-link" @click="visible = !visible"
+              >Uživatelé</RouterLink
+            >
+          </li>
         </ul>
         <ul class="navbar-nav">
           <li v-if="loggedUsername">
-            <RouterLink to="/" class="nav-link" @click="visible = !visible">{{
-              loggedUsername
-            }}</RouterLink>
+            <RouterLink
+              :to="{
+                name: 'user',
+                params: { username: loggedUsername },
+              }"
+              class="nav-link"
+              @click="visible = !visible"
+              >{{ loggedUsername }}</RouterLink
+            >
           </li>
           <li v-if="token && loggedUsername" class="nav-item align-items">
             <Button plain text label="Odhlásit se" @click="logout()"></Button>
