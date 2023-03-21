@@ -6,6 +6,7 @@ import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
+const token = ref(localStorage.getItem("token"));
 
 onMounted(() => {
   getActivitiesUsers();
@@ -28,13 +29,22 @@ function closeModal() {
   displayModal.value = false;
 }
 
+/**
+ * gets table with all activities and all users
+ */
 const getActivitiesUsers = async () => {
-  const response = await axios.get<IUserActivityTable>(
-    "http://127.0.0.1:8000/api/userActivitiesTable/"
-  );
+  const response = await axios({
+    method: "get",
+    url: "http://127.0.0.1:8000/api/userActivitiesTable/",
+    headers: { Authorization: `Bearer ${token.value}` },
+  });
   table.value = response.data;
 };
 
+/**
+ * counts points based on done activities for specific user
+ * @param student user to count points for
+ */
 function countPoints(student: IUser): number {
   let sum: number = 2;
   console.log("im here");
@@ -72,16 +82,24 @@ async function checkboxChange(activity: IActivity, student: IUser) {
           entry.username === student.username
       )
     ) {
-      await axios.delete("http://127.0.0.1:8000/api/activityUnDone", {
+      await axios({
+        method: "delete",
+        url: "http://127.0.0.1:8000/api/activityDone",
         data: {
           username: student.username,
           activity: activity.name,
         },
+        headers: { Authorization: `Bearer ${token.value}` },
       });
     } else {
-      await axios.post("http://127.0.0.1:8000/api/activityDone", {
-        username: student.username,
-        activity: activity.name,
+      await axios({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/activityDone",
+        data: {
+          username: student.username,
+          activity: activity.name,
+        },
+        headers: { Authorization: `Bearer ${token.value}` },
       });
     }
   }
@@ -93,7 +111,12 @@ const store = async (data: {
   description: string;
 }) => {
   try {
-    await axios.post("http://127.0.0.1:8000/api/activity", data);
+    await axios({
+      method: "post",
+      data: data,
+      url: "http://127.0.0.1:8000/api/activity/",
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     toast.add({
       severity: "success",
       summary: "Aktivita",
@@ -117,7 +140,11 @@ async function deleteActivity(activity: IActivity) {
     return;
   }
   try {
-    await axios.delete("http://127.0.0.1:8000/api/activity/" + activity.name);
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/activity/" + activity.name,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     toast.add({
       severity: "success",
       summary: "Aktivita",
@@ -131,6 +158,7 @@ async function deleteActivity(activity: IActivity) {
       detail: "Aktivitu se nepodařilo smazat",
       life: 3000,
     });
+    return;
   }
   await getActivitiesUsers();
 }

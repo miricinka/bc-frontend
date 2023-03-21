@@ -1,3 +1,37 @@
+export interface News {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  text: string;
+}
+export interface INewsWithComment {
+  commentCount: number;
+  news: News;
+}
+
+export interface IComment {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  text: string;
+  news_id: number;
+  username: string;
+}
+
+export interface IStoreNewsError {
+  errors: {
+    title: string[];
+    text: string[];
+  };
+}
+
+export interface IStoreCommentError {
+  errors: {
+    text: string[];
+  };
+}
+
 export interface IActivity {
   name: string;
   weight: number;

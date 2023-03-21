@@ -10,6 +10,7 @@ import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
+const token = ref(localStorage.getItem("token"));
 
 onMounted(() => {
   getAttendance();
@@ -30,9 +31,11 @@ function closeModal() {
 }
 
 const getAttendance = async () => {
-  const response = await axios.get<IAttendanceUserTable>(
-    "http://127.0.0.1:8000/api/attendanceUsersTable"
-  );
+  const response = await axios({
+    method: "get",
+    url: "http://127.0.0.1:8000/api/attendanceUsersTable",
+    headers: { Authorization: `Bearer ${token.value}` },
+  });
   table.value = response.data;
 };
 
@@ -47,17 +50,19 @@ async function submit() {
     return;
   }
   try {
-    await axios.post(
-      "http://127.0.0.1:8000/api/attendanceDay",
-      dates.value.map((entry) => {
+    await axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/attendanceDay",
+      data: dates.value.map((entry) => {
         return {
           date: new Date(entry.getTime() - entry.getTimezoneOffset() * 60000)
             .toISOString()
             .slice(0, 19)
             .replace("T", " "),
         };
-      })
-    );
+      }),
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     getAttendance();
     closeModal();
     toast.add({
@@ -86,16 +91,24 @@ async function checkboxChange(day: IAttendanceDay, student: IUser) {
           entry.username === student.username
       )
     ) {
-      await axios.delete("http://127.0.0.1:8000/api/attendance", {
+      await axios({
+        method: "delete",
+        url: "http://127.0.0.1:8000/api/attendance",
         data: {
           username: student.username,
           attendance_day_id: day.id,
         },
+        headers: { Authorization: `Bearer ${token.value}` },
       });
     } else {
-      await axios.post("http://127.0.0.1:8000/api/attendance", {
-        username: student.username,
-        attendance_day_id: day.id,
+      await axios({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/attendance",
+        data: {
+          username: student.username,
+          attendance_day_id: day.id,
+        },
+        headers: { Authorization: `Bearer ${token.value}` },
       });
     }
   }
@@ -106,7 +119,11 @@ async function deleteDay(date: IAttendanceDay) {
     return;
   }
   try {
-    await axios.delete("http://127.0.0.1:8000/api/attendance/" + date.id);
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/attendance/" + date.id,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     toast.add({
       severity: "success",
       summary: "Den docházky",

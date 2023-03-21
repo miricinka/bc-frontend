@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import type { IStoreNewsError } from "@/api/news";
 import router from "@/router";
 import axios, { AxiosError } from "axios";
 import { reactive, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+import type { IStoreNewsError } from "@/shared/interface";
+
+const toast = useToast();
+
+const token = ref(localStorage.getItem("token"));
 
 const errors = ref<IStoreNewsError>();
 
@@ -13,14 +18,29 @@ const form = reactive({
 
 const store = async (data: { title: string; text: string }) => {
   try {
-    await axios.post("http://127.0.0.1:8000/api/news", data);
+    await axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/news",
+      data: data,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    toast.add({
+      severity: "success",
+      summary: "Novinka vytvořena",
+      life: 3000,
+    });
     await router.push("/");
   } catch (error) {
     if (error instanceof AxiosError) {
       errors.value = error.response?.data;
       console.log(errors.value);
     } else {
-      console.log("Unexpected error", error);
+      toast.add({
+        severity: "error",
+        summary: "Novinka",
+        detail: "Novinku se nepodařilo vytvořit",
+        life: 3000,
+      });
     }
   }
 };

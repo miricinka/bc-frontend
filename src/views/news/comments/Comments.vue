@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { IComment, IStoreCommentError, News } from "@/api/news";
 import axios, { AxiosError } from "axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "primevue/usetoast";
+import type { IComment, IStoreCommentError, News } from "@/shared/interface";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const loggedUsername = ref(localStorage.getItem("username"));
+const token = ref(localStorage.getItem("token"));
 
 interface Props {
   id: string;
@@ -40,13 +41,23 @@ const getComments = async (id: string) => {
 
 const addComment = async (comment: string) => {
   try {
-    await axios.post("http://127.0.0.1:8000/api/news/comments", {
-      username: loggedUsername.value,
-      text: comment,
-      news_id: props.id,
+    await axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/news/comments",
+      data: {
+        username: loggedUsername.value,
+        text: comment,
+        news_id: props.id,
+      },
+      headers: { Authorization: `Bearer ${token.value}` },
     });
     errors.value = undefined;
     newComment.value = "";
+    toast.add({
+      severity: "success",
+      summary: "Komentář přidán",
+      life: 3000,
+    });
     await getComments(props.id);
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -55,6 +66,13 @@ const addComment = async (comment: string) => {
     } else {
       console.log("Unexpected error", error);
     }
+    toast.add({
+      severity: "error",
+      summary: "Komentář",
+      detail: "Komentář se nepodařilo přidat",
+      life: 3000,
+    });
+    return;
   }
 };
 
@@ -63,8 +81,27 @@ const deleteComment = async (id: number) => {
   if (!window.confirm("Are you sure?")) {
     return;
   }
-  await axios.delete("http://127.0.0.1:8000/api/news/comments/" + id);
-  await getComments(props.id);
+  try {
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/news/comments/" + id,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    toast.add({
+      severity: "success",
+      summary: "Komentář smazán",
+      life: 3000,
+    });
+    await getComments(props.id);
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Komentář",
+      detail: "Komentář se nepodařilo smazat",
+      life: 3000,
+    });
+    return;
+  }
 };
 </script>
 

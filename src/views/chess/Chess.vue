@@ -10,6 +10,8 @@ import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
 
+const token = ref(localStorage.getItem("token"));
+
 interface Props {
   id?: string;
 }
@@ -53,9 +55,11 @@ chess.reset();
 currentFen.value = chess.fen();
 
 async function getGame(id: string) {
-  const response = await axios.get<IGame>(
-    "http://127.0.0.1:8000/api/game/" + id
-  );
+  const response = await axios<IGame>({
+    method: "get",
+    url: "http://127.0.0.1:8000/api/game/" + id,
+    headers: { Authorization: `Bearer ${token.value}` },
+  });
   game.value = response.data;
   pgn.value = game.value.pgn;
   loadNewPgn();

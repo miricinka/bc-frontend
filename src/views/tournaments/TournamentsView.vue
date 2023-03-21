@@ -7,7 +7,7 @@ import { useToast } from "primevue/usetoast";
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const loggedUsername = ref(localStorage.getItem("username"));
-console.log(loggedUsername.value);
+const token = ref(localStorage.getItem("token"));
 
 onMounted(() => {
   getTournaments();
@@ -45,7 +45,12 @@ async function submit(data: { title: string; date: any; description: string }) {
     .slice(0, 19)
     .replace("T", " ");
   try {
-    await axios.post("http://127.0.0.1:8000/api/tournament", data);
+    await axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/tournament",
+      data: data,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
 
     await getTournaments();
     closeModal();
@@ -70,21 +75,39 @@ async function deleteTournament(tournament: ITournament) {
   if (!window.confirm("Opravdu chcete turnaj smazat?")) {
     return;
   }
-  await axios.delete("http://127.0.0.1:8000/api/tournament/" + tournament.id);
-  toast.add({
-    severity: "success",
-    summary: "Zápas smazán",
-    life: 3000,
-  });
-  await getTournaments();
+  try {
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/tournament/" + tournament.id,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    toast.add({
+      severity: "success",
+      summary: "Zápas smazán",
+      life: 3000,
+    });
+    await getTournaments();
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Turnaj",
+      detail: "Turnaj se nepodařilo smazat",
+      life: 3000,
+    });
+  }
 }
 
 async function signUser(tournamentId: number) {
   try {
-    await axios.post(
-      "http://127.0.0.1:8000/api/tournament/" + String(tournamentId) + "/user",
-      { username: loggedUsername.value }
-    );
+    await axios({
+      method: "post",
+      url:
+        "http://127.0.0.1:8000/api/tournament/" +
+        String(tournamentId) +
+        "/user",
+      data: { username: loggedUsername.value },
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     toast.add({
       severity: "success",
       summary: "Přihlášen",
@@ -104,10 +127,15 @@ async function signUser(tournamentId: number) {
 
 async function unsignUser(tournamentId: number) {
   try {
-    await axios.delete(
-      "http://127.0.0.1:8000/api/tournament/" + String(tournamentId) + "/user",
-      { data: { username: loggedUsername.value } }
-    );
+    await axios({
+      method: "delete",
+      url:
+        "http://127.0.0.1:8000/api/tournament/" +
+        String(tournamentId) +
+        "/user",
+      data: { username: loggedUsername.value },
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     toast.add({
       severity: "success",
       summary: "Odlášen",

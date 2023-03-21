@@ -8,6 +8,7 @@ import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
+const token = ref(localStorage.getItem("token"));
 
 interface Props {
   id: string;
@@ -41,9 +42,14 @@ const PGNError = ref<boolean>(false);
   loads it to internal variable
 */
 async function getTournament() {
-  const response = await axios.get<ITournament>(
-    "http://127.0.0.1:8000/api/tournament/" + props.id
-  );
+  // const response = await axios.get<ITournament>(
+  //   "http://127.0.0.1:8000/api/tournament/" + props.id
+  // );
+  const response = await axios<ITournament>({
+    method: "get",
+    url: "http://127.0.0.1:8000/api/tournament/" + props.id,
+    headers: { Authorization: `Bearer ${token.value}` },
+  });
   tournament.value = response.data;
   //map api games to gameResult structure (omit ids and pgn)
   results.value = tournament.value.games.map((game) => {
@@ -151,6 +157,7 @@ function playPGN(result: GameResult) {
   uploads pgn, but first it checks if its valid pgn
 */
 async function uploadPGN(black: string, white: string, pgn: string) {
+  PGNError.value = false;
   if (!pgn || pgn === "") {
     PGNError.value = true;
     toast.add({
@@ -176,11 +183,16 @@ async function uploadPGN(black: string, white: string, pgn: string) {
   }
 
   try {
-    await axios.put("http://127.0.0.1:8000/api/game", {
-      black: black,
-      white: white,
-      pgn: pgn,
-      tournament_id: tournament.value?.id,
+    await axios({
+      method: "put",
+      url: "http://127.0.0.1:8000/api/game",
+      data: {
+        black: black,
+        white: white,
+        pgn: pgn,
+        tournament_id: tournament.value?.id,
+      },
+      headers: { Authorization: `Bearer ${token.value}` },
     });
   } catch {
     toast.add({

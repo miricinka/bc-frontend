@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import type { IStoreNewsError, News } from "@/api/news";
 import router from "@/router";
 import axios, { AxiosError } from "axios";
 import { onMounted, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+import type { IStoreNewsError, News } from "@/shared/interface";
+
+const toast = useToast();
+
+const token = ref(localStorage.getItem("token"));
 
 interface Props {
   id: string;
@@ -23,14 +28,27 @@ const getNews = async (id: string) => {
 
 const updateNews = async (id: string) => {
   try {
-    await axios.put("http://127.0.0.1:8000/api/news/" + id, news.value);
+    await axios({
+      method: "put",
+      url: "http://127.0.0.1:8000/api/news/" + id,
+      data: news.value,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    toast.add({
+      severity: "success",
+      summary: "Novinka upravena",
+      life: 3000,
+    });
     await router.push("/");
   } catch (error) {
     if (error instanceof AxiosError) {
       errors.value = error.response?.data;
-      console.log(errors.value);
     } else {
-      console.log("Unexpected error", error);
+      toast.add({
+        severity: "error",
+        summary: "Novinku se nepodařilo upravit",
+        life: 3000,
+      });
     }
   }
 };

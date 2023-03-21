@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import type News from "@/components/News.vue";
-import newsApi, { type INewsWithComment } from "@/api/news";
 import { onMounted, reactive, ref } from "vue";
 import type { PageState } from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
-import type { IEvent } from "@/shared/interface";
+import type { IEvent, INewsWithComment } from "@/shared/interface";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
+const token = ref(localStorage.getItem("token"));
 
-const { news, getNews } = newsApi();
+const news = ref<INewsWithComment[]>([]);
 const visibleNews = ref<INewsWithComment[]>([]);
 const visibleEvents = ref<IEvent[]>([]);
 const events = ref<IEvent[]>();
@@ -35,6 +34,14 @@ onMounted(async () => {
   await getEvents();
 });
 
+async function getNews() {
+  const response = await axios.get<INewsWithComment[]>(
+    "http://127.0.0.1:8000/api/news"
+  );
+  news.value = response.data;
+  visibleNews.value = news.value.slice(0, 3);
+}
+
 /*
 deletes specific news by id and refreshes all news
 triggers success/error delete notification
@@ -44,7 +51,11 @@ const deleteNews = async (id: number) => {
     if (!window.confirm("Are you sure?")) {
       return;
     }
-    await axios.delete("http://127.0.0.1:8000/api/news/" + id);
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/news/" + id,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
   } catch {
     toast.add({
       severity: "error",
@@ -56,8 +67,8 @@ const deleteNews = async (id: number) => {
   }
   toast.add({
     severity: "success",
-    summary: "Article deleted",
-    detail: "Article deleted",
+    summary: "Novinka",
+    detail: "Novinka smazána",
     life: 3000,
   });
   await getNews();
@@ -70,7 +81,6 @@ const deleteNews = async (id: number) => {
 pagination - updates visible news
 */
 function onNewsPage(event: PageState) {
-  console.log(event);
   if (news.value) {
     visibleNews.value = news.value.slice(event.first, event.first + event.rows);
   }
@@ -80,7 +90,6 @@ function onNewsPage(event: PageState) {
 pagination - updates visible events
 */
 function onEventPage(event: PageState) {
-  console.log(event);
   if (events.value) {
     visibleEvents.value = events.value.slice(
       event.first,
@@ -118,7 +127,11 @@ async function deleteEvent(id: number) {
     return;
   }
   try {
-    await axios.delete("http://127.0.0.1:8000/api/event/" + id);
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/event/" + id,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
   } catch {
     toast.add({
       severity: "error",
@@ -189,13 +202,18 @@ stores event, triggers success/error notification and gets again all events
 */
 async function storeEvent(name: string, date: Date, description: string) {
   try {
-    await axios.post("http://127.0.0.1:8000/api/event", {
-      name: name,
-      date: new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " "),
-      description: description,
+    await axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/event/",
+      data: {
+        name: name,
+        date: new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " "),
+        description: description,
+      },
+      headers: { Authorization: `Bearer ${token.value}` },
     });
   } catch {
     toast.add({
@@ -222,17 +240,19 @@ updates event, triggers success/error notification and refreshes all events
 async function updateEvent(name: string, date: Date, description: string) {
   if (editingEvent.value) {
     try {
-      await axios.put(
-        "http://127.0.0.1:8000/api/event/" + editingEvent.value.id,
-        {
+      await axios({
+        method: "put",
+        url: "http://127.0.0.1:8000/api/event/" + editingEvent.value.id,
+        data: {
           name: name,
           date: new Date(date.getTime() - date.getTimezoneOffset() * 60000)
             .toISOString()
             .slice(0, 19)
             .replace("T", " "),
           description: description,
-        }
-      );
+        },
+        headers: { Authorization: `Bearer ${token.value}` },
+      });
     } catch {
       toast.add({
         severity: "error",
@@ -384,7 +404,6 @@ async function updateEvent(name: string, date: Date, description: string) {
                 cols="50"
                 aria-labelledby="text-area-text"
               />
-              {{ form.date }}
             </div>
             <div>
               <Button
