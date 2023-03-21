@@ -191,6 +191,7 @@ async function deleteActivity(activity: IActivity) {
                   <th scope="row">{{ student.name }}</th>
                   <td v-for="activity in table.activities">
                     <Checkbox
+                      :disabled="loggedRole !== 'admin'"
                       :value="{
                         activity: activity.name,
                         username: student.username,

@@ -300,6 +300,7 @@ function calculateRank(user: IUser) {
                         >
                           <label for="tie">1</label>
                           <Checkbox
+                            :disabled="loggedRole !== 'admin'"
                             :value="{
                               black: user.username,
                               white: userColumn.username,
@@ -317,6 +318,7 @@ function calculateRank(user: IUser) {
                           />
                           <label for="tie">0</label>
                           <Checkbox
+                            :disabled="loggedRole !== 'admin'"
                             :value="{
                               black: user.username,
                               white: userColumn.username,
@@ -334,6 +336,7 @@ function calculateRank(user: IUser) {
                           />
                           <label for="tie">1/2</label>
                           <Checkbox
+                            :disabled="loggedRole !== 'admin'"
                             :value="{
                               black: user.username,
                               white: userColumn.username,
@@ -353,6 +356,7 @@ function calculateRank(user: IUser) {
                         <template v-else>
                           <label for="tie">1</label>
                           <Checkbox
+                            :disabled="loggedRole !== 'admin'"
                             :value="{
                               black: userColumn.username,
                               white: user.username,
@@ -370,6 +374,7 @@ function calculateRank(user: IUser) {
                           />
                           <label for="tie">0</label>
                           <Checkbox
+                            :disabled="loggedRole !== 'admin'"
                             :value="{
                               black: userColumn.username,
                               white: user.username,
@@ -387,6 +392,7 @@ function calculateRank(user: IUser) {
                           />
                           <label for="tie">1/2</label>
                           <Checkbox
+                            :disabled="loggedRole !== 'admin'"
                             :value="{
                               black: userColumn.username,
                               white: user.username,

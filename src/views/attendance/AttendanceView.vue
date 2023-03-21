@@ -167,6 +167,7 @@ async function deleteDay(date: IAttendanceDay) {
                   <th scope="row">{{ student.name }}</th>
                   <td v-for="date in table.attendanceDays">
                     <Checkbox
+                      :disabled="loggedRole !== 'admin'"
                       :value="{
                         attendance_day_id: date.id,
                         username: student.username,
