@@ -3,12 +3,16 @@ import type { IActivity, IUser, IUserActivityTable } from "@/shared/interface";
 import axios, { AxiosError } from "axios";
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
+import router from "@/router";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const token = ref(localStorage.getItem("token"));
 
 onMounted(() => {
+  if (!token.value) {
+    router.push("/notAuth");
+  }
   getActivitiesUsers();
 });
 

@@ -7,6 +7,7 @@ import { Chess, type Move, type Square } from "chess.js";
 import axios from "axios";
 import type { IGame } from "@/shared/interface";
 import { useToast } from "primevue/usetoast";
+import router from "@/router";
 
 const toast = useToast();
 
@@ -37,6 +38,9 @@ const PGNError = ref<boolean>(false);
 
 onMounted(() => {
   if (props.id) {
+    if (!token.value) {
+      router.push("/pageNotFound");
+    }
     getGame(props.id);
   }
 });

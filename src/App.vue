@@ -123,7 +123,7 @@ async function logout() {
               >Chess</RouterLink
             >
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="loggedRole">
             <RouterLink
               to="/activities"
               class="nav-link"
@@ -131,7 +131,7 @@ async function logout() {
               >Aktivity</RouterLink
             >
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="loggedRole">
             <RouterLink
               to="/attendance"
               class="nav-link"
@@ -202,12 +202,21 @@ async function logout() {
     </form>
   </Dialog>
 
-  <RouterView />
+  <body>
+    <RouterView />
+  </body>
+  <Footer></Footer>
 </template>
 
 <style>
 nav {
   background-color: #fca503;
+}
+
+body {
+  min-height: 78vh;
+  display: flex;
+  flex-direction: column;
 }
 .p-password {
   width: 70% !important;

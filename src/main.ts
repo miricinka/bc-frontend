@@ -40,6 +40,7 @@ import News from "./components/News.vue";
 import Comment from "./components/Comment.vue";
 import Tournament from "./components/Tournament.vue";
 import Event from "./components/Event.vue";
+import Footer from "./components/Footer.vue";
 
 import CardLoading from "./components/CardLoading.vue";
 import TableLoading from "./components/TableLoading.vue";
@@ -75,6 +76,7 @@ app.component("News", News);
 app.component("Comment", Comment);
 app.component("Tournament", Tournament);
 app.component("Event", Event);
+app.component("Footer", Footer);
 
 app.component("CardLoading", CardLoading);
 app.component("TableLoading", TableLoading);

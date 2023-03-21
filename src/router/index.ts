@@ -58,6 +58,20 @@ const router = createRouter({
       component: () => import("../views/tournaments/TournamentView.vue"),
       props: true,
     },
+    {
+      path: "/pageNotFound",
+      name: "pageNotFound",
+      component: () => import("../views/other/PageNotFound.vue"),
+    },
+    {
+      path: "/notAuth",
+      name: "notAuth",
+      component: () => import("../views/other/PermissionDenied.vue"),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      component: () => import("../views/other/PageNotFound.vue"),
+    },
   ],
 });
 

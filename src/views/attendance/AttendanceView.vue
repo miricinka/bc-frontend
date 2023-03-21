@@ -7,12 +7,16 @@ import type {
 import axios from "axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "primevue/usetoast";
+import router from "@/router";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const token = ref(localStorage.getItem("token"));
 
 onMounted(() => {
+  if (!token.value) {
+    router.push("/notAuth");
+  }
   getAttendance();
 });
 
