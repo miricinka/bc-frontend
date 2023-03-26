@@ -50,8 +50,7 @@ const getActivitiesUsers = async () => {
  * @param student user to count points for
  */
 function countPoints(student: IUser): number {
-  let sum: number = 2;
-  console.log("im here");
+  let sum: number = 0;
   if (table.value) {
     sum = [...table.value.done].reduce(
       (total, entry) =>

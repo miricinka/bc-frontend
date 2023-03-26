@@ -66,11 +66,16 @@ async function checkboxChange(
 ) {
   showSkeleton.value = true;
   try {
-    await axios.put("http://127.0.0.1:8000/api/game", {
-      black: black,
-      white: white,
-      winner: winner,
-      tournament_id: tournament.value?.id,
+    await axios({
+      method: "put",
+      url: "http://127.0.0.1:8000/api/game",
+      data: {
+        black: black,
+        white: white,
+        winner: winner,
+        tournament_id: tournament.value?.id,
+      },
+      headers: { Authorization: `Bearer ${token.value}` },
     });
   } catch {
     toast.add({
@@ -78,6 +83,15 @@ async function checkboxChange(
       detail: "Změnu se nepodařilo uložit",
       life: 3000,
     });
+    //remove new change in case of error
+    results.value = results.value.filter(
+      (entry) =>
+        !(
+          entry.black === black &&
+          entry.white === white &&
+          entry.winner === winner
+        )
+    );
     return;
   }
   //remove old value from frontend

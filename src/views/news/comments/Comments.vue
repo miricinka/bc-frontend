@@ -183,7 +183,8 @@ const deleteComment = async (id: number) => {
           :dateCreated="comment.created_at"
           :username="comment.username"
           :showButtons="
-            comment.username === loggedUsername || loggedRole === 'admin'
+            (loggedUsername && comment.username === loggedUsername) ||
+            loggedRole === 'admin'
           "
           @delete="deleteComment"
           @reload="getComments(props.id)"
