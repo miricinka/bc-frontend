@@ -179,7 +179,9 @@ async function unsignUser(tournamentId: number) {
                   :date="tournament.date"
                   :usersCount="tournament.users_count"
                   :role="loggedRole"
-                  :showButtons="new Date(tournament.date) >= new Date()"
+                  :showButtons="
+                    new Date(tournament.date) >= new Date() && loggedUsername
+                  "
                   :isSigned="
                     tournament.users?.some(
                       (user) => user.username === loggedUsername

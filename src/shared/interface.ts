@@ -124,3 +124,10 @@ export interface IToken {
 export interface ILoginResponse {
   data: IToken;
 }
+
+export interface IInfo {
+  activities: IActivity[];
+  doneActivities: { name: string; weight: number }[];
+  attendance: IAttendanceDay[];
+  attended: { id: number }[];
+}

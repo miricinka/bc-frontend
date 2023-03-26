@@ -289,7 +289,7 @@ function calculateRank(user: IUser) {
                     <th scope="col" v-for="user in tournament.users">
                       <div class="d-flex flex-column">
                         <span>
-                          {{ user.name + " " + user.surname }}
+                          {{ user.username }}
                         </span>
                       </div>
                     </th>
@@ -301,7 +301,7 @@ function calculateRank(user: IUser) {
                   <tr v-for="(user, iRow) in tournament.users">
                     <th scope="row">
                       <span>
-                        {{ user.name + " " + user.surname }}
+                        {{ user.username }}
                       </span>
                     </th>
                     <td

@@ -59,7 +59,6 @@ async function login(data: { username: string; password: string }) {
 }
 
 async function logout() {
-  console.log(token.value);
   try {
     axios({
       method: "post",
@@ -77,7 +76,7 @@ async function logout() {
       summary: "Úspěšně odhlášeno",
       life: 3000,
     });
-    router.go(0);
+    router.push("/");
   } catch (error) {
     toast.add({
       severity: "error",
