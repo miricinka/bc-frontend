@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { IInfo, IUser } from "@/shared/interface";
-import axios from "axios";
+import type { IInfo, IStoreUserError, IUser } from "@/shared/interface";
+import axios, { AxiosError } from "axios";
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 
@@ -15,10 +15,19 @@ const loggedUsername = ref(localStorage.getItem("username"));
 const token = ref(localStorage.getItem("token"));
 
 const displayPasswordModal = ref(false);
+const displayEditModal = ref(false);
+const errors = ref<IStoreUserError>();
 
 const passwordForm = reactive({
   current_password: "",
   new_password: "",
+});
+
+const userForm = reactive({
+  username: "",
+  name: "",
+  surname: "",
+  email: "",
 });
 
 const user = ref<IUser>();
@@ -37,6 +46,20 @@ function openPasswordModal() {
 function closePasswordModal() {
   displayPasswordModal.value = false;
   resetPasswordForm();
+}
+
+function openEditModal() {
+  displayEditModal.value = true;
+  if (user.value) {
+    (userForm.email = user.value.email),
+      (userForm.username = user.value.username),
+      (userForm.name = user.value.name),
+      (userForm.surname = user.value.surname);
+  }
+}
+
+function closeEditModal() {
+  displayEditModal.value = false;
 }
 
 function resetPasswordForm() {
@@ -96,6 +119,41 @@ function countPoints(
 ): number {
   return array.reduce((sum, activity) => sum + activity.weight, 0);
 }
+
+async function edit(data: {
+  username: string;
+  name: string;
+  surname: string;
+  email: string;
+}) {
+  try {
+    await axios({
+      method: "put",
+      url: "http://127.0.0.1:8000/api/users/" + data.username,
+      data: data,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    await getUser();
+    closeEditModal();
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      errors.value = error.response?.data;
+    }
+    toast.add({
+      severity: "error",
+      summary: "Uživatel",
+      detail: "Uživatele se nepodařilo upravit",
+      life: 3000,
+    });
+    return;
+  }
+  toast.add({
+    severity: "success",
+    summary: "Uživatel",
+    detail: "Uživatel upraven",
+    life: 3000,
+  });
+}
 </script>
 <template>
   <div class="container mt-5">
@@ -109,6 +167,7 @@ function countPoints(
               label="Upravit údaje"
               icon="pi pi-user"
               class="p-button-raised p-button-success"
+              @click="openEditModal()"
             />
             <Button
               v-if="loggedUsername === props.username"
@@ -235,6 +294,74 @@ function countPoints(
             icon="pi pi-check-square"
             class="p-button-raised"
           ></Button>
+        </div>
+      </form>
+    </Dialog>
+
+    <Dialog
+      header="Upravit Uživatele"
+      v-model:visible="displayEditModal"
+      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+      :style="{ width: '60vw' }"
+      :modal="true"
+    >
+      <form @submit.prevent="edit(userForm)">
+        <div class="my-6 user-form">
+          <h5 id="text-area-text">Username</h5>
+          <InputText
+            type="text"
+            disabled="true"
+            v-model="userForm.username"
+            :class="`${errors?.errors.username ? 'p-invalid' : ''}`"
+          />
+          <h5 id="text-area-text">email</h5>
+          <InputText
+            type="text"
+            v-model="userForm.email"
+            :class="`${errors?.errors.email ? 'p-invalid' : ''}`"
+          />
+          <div v-if="errors">
+            <div v-if="errors.errors.email">
+              <small id="title-help" class="p-error">{{
+                errors.errors.email[0]
+              }}</small>
+            </div>
+          </div>
+          <h5 id="text-area-text">Jméno</h5>
+          <InputText
+            type="text"
+            v-model="userForm.name"
+            :class="`${errors?.errors.name ? 'p-invalid' : ''}`"
+          />
+          <div v-if="errors">
+            <div v-if="errors.errors.name">
+              <small id="title-help" class="p-error">{{
+                errors.errors.name[0]
+              }}</small>
+            </div>
+          </div>
+          <h5 id="text-area-text">Příjmení</h5>
+          <InputText
+            type="text"
+            v-model="userForm.surname"
+            :class="`${errors?.errors.surname ? 'p-invalid' : ''}`"
+          />
+          <div v-if="errors">
+            <div v-if="errors.errors.surname">
+              <small id="title-help" class="p-error">{{
+                errors.errors.surname[0]
+              }}</small>
+            </div>
+          </div>
+        </div>
+        <div>
+          <Button
+            label="Zpět"
+            icon="pi pi-times"
+            @click="closeEditModal()"
+            class="p-button-text"
+          />
+          <Button label="Nahrát" icon="pi pi-check" type="submit" />
         </div>
       </form>
     </Dialog>
