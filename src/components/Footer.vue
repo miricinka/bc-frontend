@@ -15,7 +15,7 @@
                 <p>+420 123 456 789</p>
               </li>
               <li>
-                <p><a href="#">admin@admin.com</a></p>
+                <p><a href="#">sachy-kurim@seznam.cz</a></p>
               </li>
               <li>
                 <p>Legionářská 789, Kuřim</p>

@@ -45,6 +45,16 @@ export interface IUser {
   email: string;
 }
 
+export interface IStoreUserError {
+  errors: {
+    username: string[];
+    name: string[];
+    surname: string[];
+    email: string[];
+    password: string[];
+  };
+}
+
 export interface IUserActivity {
   activity: string;
   username: string;

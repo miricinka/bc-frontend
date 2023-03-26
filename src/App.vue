@@ -17,7 +17,7 @@ const loggedUsername = ref(localStorage.getItem("username"));
 const loggedRole = ref(localStorage.getItem("role"));
 
 const loginForm = reactive({
-  email: "",
+  username: "",
   password: "",
 });
 
@@ -25,7 +25,7 @@ function openLoginModal() {
   displayModal.value = true;
 }
 
-async function login(data: { email: string; password: string }) {
+async function login(data: { username: string; password: string }) {
   loginError.value = false;
   try {
     const response: ILoginResponse = await axios.post(
@@ -114,11 +114,6 @@ async function logout() {
       >
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <RouterLink to="/about" class="nav-link" @click="visible = !visible"
-              >O klubu</RouterLink
-            >
-          </li>
-          <li class="nav-item active">
             <RouterLink to="/chess" class="nav-link" @click="visible = !visible"
               >Chess</RouterLink
             >
@@ -185,10 +180,10 @@ async function logout() {
   >
     <form @submit.prevent="login(loginForm)">
       <div class="m-4">
-        <h5 id="text-area-text">Email</h5>
+        <h5 id="text-area-text">Přihlašovací jméno</h5>
         <InputText
           type="text"
-          v-model="loginForm.email"
+          v-model="loginForm.username"
           style="width: 70%"
           :class="`${loginError ? 'p-invalid' : ''}`"
         />

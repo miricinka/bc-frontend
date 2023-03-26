@@ -365,16 +365,6 @@ async function updateEvent(name: string, date: Date, description: string) {
               </Card>
             </div>
           </div>
-          <div class="row pt-3">
-            <div class="news">
-              <Card>
-                <template #title> Novinky z okolí </template>
-                <template #content>
-                  <ProgressSpinner></ProgressSpinner>
-                </template>
-              </Card>
-            </div>
-          </div>
         </div>
         <Dialog
           header="Přidat akci"
