@@ -180,11 +180,26 @@ async function edit(data: {
         </div>
       </template>
       <template #content>
+        <div class="row-user d-flex justify-content" v-if="user">
+          <div class="col-3">
+            <div class="podium-user">
+              <div class="winner-user">
+                <span class="position-user">1</span>
+                <div v-if="true">
+                  <h2>{{ user.username }}</h2>
+                  <h2>{{ points }} xp</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-7">
+            <h5>{{ user.name }}</h5>
+            <h5>{{ user.surname }}</h5>
+            <h5>{{ user.email }}</h5>
+            Celkem získáno bodů: {{ points }}
+          </div>
+        </div>
         <div v-if="user">
-          <h5>{{ user.name }}</h5>
-          <h5>{{ user.surname }}</h5>
-          <h5>{{ user.email }}</h5>
-          Celkem získáno bodů: {{ points }}
           <TabView>
             <TabPanel header="Aktivity">
               <template v-if="info">
@@ -374,5 +389,63 @@ async function edit(data: {
 }
 .user-buttons Button {
   margin: 2px;
+}
+
+.podium-user {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 160px;
+}
+
+.winner-user {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 25px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.position-user {
+  height: 35px;
+  width: 35px;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #3e3e3e;
+  padding: 5px 10px;
+  border-radius: 50%;
+}
+
+.first {
+  background-color: #fcd116;
+}
+
+.second {
+  background-color: #d0d0d0;
+}
+
+.third {
+  background-color: #cd7f32;
+}
+
+.winner-user:hover {
+  transform: scale(1.1);
+}
+
+.podium-user .winner-user div {
+  margin-top: 15px;
+}
+
+.row-user {
+  margin-bottom: 15px;
 }
 </style>
