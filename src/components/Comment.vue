@@ -76,7 +76,7 @@ async function editComment(text: string) {
                       name: 'user',
                       params: { username: username },
                     }"
-                    >{{ username }}</RouterLink
+                    ><h2>{{ username }}</h2></RouterLink
                   >
                 </template>
                 <template v-else>{{ username }}</template>

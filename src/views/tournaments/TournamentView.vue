@@ -289,7 +289,13 @@ function calculateRank(user: IUser) {
                     <th scope="col" v-for="user in tournament.users">
                       <div class="d-flex flex-column">
                         <span>
-                          {{ user.username }}
+                          <RouterLink
+                            :to="{
+                              name: 'user',
+                              params: { username: user.username },
+                            }"
+                            ><h2>{{ user.username }}</h2></RouterLink
+                          >
                         </span>
                       </div>
                     </th>
@@ -301,7 +307,13 @@ function calculateRank(user: IUser) {
                   <tr v-for="(user, iRow) in tournament.users">
                     <th scope="row">
                       <span>
-                        {{ user.username }}
+                        <RouterLink
+                          :to="{
+                            name: 'user',
+                            params: { username: user.username },
+                          }"
+                          ><h2>{{ user.username }}</h2></RouterLink
+                        >
                       </span>
                     </th>
                     <td
@@ -473,9 +485,33 @@ function calculateRank(user: IUser) {
                     <tbody>
                       <tr v-for="(result, index) in results">
                         <th scope="row">{{ index }}</th>
-                        <td>{{ result.black }}</td>
-                        <td>{{ result.white }}</td>
-                        <td>{{ result.winner }}</td>
+                        <td>
+                          <RouterLink
+                            :to="{
+                              name: 'user',
+                              params: { username: result.black },
+                            }"
+                            ><h2>{{ result.black }}</h2></RouterLink
+                          >
+                        </td>
+                        <td>
+                          <RouterLink
+                            :to="{
+                              name: 'user',
+                              params: { username: result.white },
+                            }"
+                            ><h2>{{ result.white }}</h2></RouterLink
+                          >
+                        </td>
+                        <td>
+                          <RouterLink
+                            :to="{
+                              name: 'user',
+                              params: { username: result.winner },
+                            }"
+                            ><h2>{{ result.winner }}</h2></RouterLink
+                          >
+                        </td>
                         <td>
                           <template v-if="hasPGN(result)">
                             <Button

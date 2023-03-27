@@ -131,3 +131,8 @@ export interface IInfo {
   attendance: IAttendanceDay[];
   attended: { id: number }[];
 }
+
+export interface IUsernamePoints {
+  username: string;
+  activities_sum_weight: number;
+}

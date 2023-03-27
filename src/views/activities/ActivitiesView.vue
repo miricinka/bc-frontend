@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { IActivity, IUser, IUserActivityTable } from "@/shared/interface";
+import type {
+  IActivity,
+  IUsernamePoints,
+  IUser,
+  IUserActivityTable,
+} from "@/shared/interface";
 import axios, { AxiosError } from "axios";
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
@@ -9,11 +14,18 @@ const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const token = ref(localStorage.getItem("token"));
 
+const usersPoints = ref<IUsernamePoints[]>();
+const first = ref<IUsernamePoints>();
+const second = ref<IUsernamePoints>();
+const third = ref<IUsernamePoints>();
+const otherUsers = ref<IUsernamePoints[]>();
+
 onMounted(() => {
   if (!token.value) {
     router.push("/notAuth");
   }
   getActivitiesUsers();
+  getUsersPoints();
 });
 
 const table = ref<IUserActivityTable>();
@@ -44,6 +56,21 @@ const getActivitiesUsers = async () => {
   });
   table.value = response.data;
 };
+
+async function getUsersPoints() {
+  const response = await axios({
+    method: "get",
+    url: "http://127.0.0.1:8000/api/users/points",
+    headers: { Authorization: `Bearer ${token.value}` },
+  });
+  usersPoints.value = response.data;
+  if (usersPoints.value) {
+    first.value = usersPoints.value[0] || null;
+    second.value = usersPoints.value[1] || null;
+    third.value = usersPoints.value[2] || null;
+    otherUsers.value = usersPoints.value.slice(3) || null;
+  }
+}
 
 /**
  * counts points based on done activities for specific user
@@ -184,59 +211,120 @@ async function deleteActivity(activity: IActivity) {
       </template>
       <template #content>
         <template v-if="table">
-          <div class="activities-scrollable">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col"></th>
-                  <th scope="col" v-for="activity in table.activities">
-                    <div class="d-flex flex-column">
-                      <span>
-                        {{ activity.name }}
-                        <Button
-                          v-if="loggedRole === 'admin'"
-                          icon="pi pi-trash"
-                          @click="deleteActivity(activity)"
-                          class="p-button-danger p-button-sm"
+          <TabView>
+            <TabPanel header="Pořadí">
+              <div class="podium">
+                <div class="winner second">
+                  <span class="position">2</span>
+                  <div v-if="second">
+                    <h2>{{ second.username }}</h2>
+                    <h2>{{ second.activities_sum_weight }} xp</h2>
+                  </div>
+                </div>
+                <div class="winner first">
+                  <span class="position">1</span>
+                  <div v-if="first">
+                    <h2>{{ first.username }}</h2>
+                    <h2>{{ first.activities_sum_weight }} xp</h2>
+                  </div>
+                </div>
+                <div class="winner third">
+                  <span class="position">3</span>
+                  <div v-if="third">
+                    <h2>{{ third.username }}</h2>
+                    <h2>{{ third.activities_sum_weight || 0 }} xp</h2>
+                  </div>
+                </div>
+              </div>
+              <table class="points table table-hover">
+                <thead>
+                  <tr>
+                    <th>Pořadí</th>
+                    <th>Login</th>
+                    <th>Body</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(user, index) in otherUsers">
+                    <td>{{ index + 4 }}.</td>
+                    <td>
+                      <RouterLink
+                        :to="{
+                          name: 'user',
+                          params: { username: user.username },
+                        }"
+                        ><h2>{{ user.username }}</h2></RouterLink
+                      >
+                    </td>
+                    <td>{{ user.activities_sum_weight || 0 }} xp</td>
+                  </tr>
+                </tbody>
+              </table></TabPanel
+            >
+            <TabPanel header="Splněno">
+              <div class="activities-scrollable">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col" v-for="activity in table.activities">
+                        <div class="d-flex flex-column">
+                          <span>
+                            {{ activity.name }}
+                            <Button
+                              v-if="loggedRole === 'admin'"
+                              icon="pi pi-trash"
+                              @click="deleteActivity(activity)"
+                              class="p-button-danger p-button-sm"
+                            />
+                            <Button
+                              v-tooltip.top.focus="
+                                `${
+                                  activity.description
+                                    ? activity.description
+                                    : 'Žádný popis'
+                                }`
+                              "
+                              icon="pi pi-question-circle"
+                              class="p-button-sm"
+                            />
+                          </span>
+                          <span> {{ activity.weight }} xp </span>
+                        </div>
+                      </th>
+                      <th scope="col">Celkem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="student in table.users">
+                      <th scope="row">
+                        <RouterLink
+                          :to="{
+                            name: 'user',
+                            params: { username: student.username },
+                          }"
+                          ><h2>{{ student.username }}</h2></RouterLink
+                        >
+                      </th>
+                      <td v-for="activity in table.activities">
+                        <Checkbox
+                          :disabled="loggedRole !== 'admin'"
+                          :value="{
+                            activity: activity.name,
+                            username: student.username,
+                          }"
+                          name="category"
+                          v-model="table.done"
+                          @click="checkboxChange(activity, student)"
                         />
-                        <Button
-                          v-tooltip.top.focus="
-                            `${
-                              activity.description
-                                ? activity.description
-                                : 'Žádný popis'
-                            }`
-                          "
-                          icon="pi pi-question-circle"
-                          class="p-button-sm"
-                        />
-                      </span>
-                      <span> {{ activity.weight }} xp </span>
-                    </div>
-                  </th>
-                  <th scope="col">Celkem</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="student in table.users">
-                  <th scope="row">{{ student.name }}</th>
-                  <td v-for="activity in table.activities">
-                    <Checkbox
-                      :disabled="loggedRole !== 'admin'"
-                      :value="{
-                        activity: activity.name,
-                        username: student.username,
-                      }"
-                      name="category"
-                      v-model="table.done"
-                      @click="checkboxChange(activity, student)"
-                    />
-                  </td>
-                  <td>{{ countPoints(student) }} xp</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                      <td>{{ countPoints(student) }} xp</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </TabPanel>
+          </TabView>
         </template>
         <template v-else>
           <TableLoading></TableLoading>
@@ -301,5 +389,65 @@ table td {
 
 .activities-scrollable {
   overflow-x: auto;
+}
+
+.podium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 160px;
+}
+
+.winner {
+  position: relative;
+  width: 150px;
+  height: 80px;
+  margin: 0 25px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.position {
+  height: 35px;
+  width: 35px;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #3e3e3e;
+  padding: 5px 10px;
+  border-radius: 50%;
+}
+
+.first {
+  z-index: 3;
+  transform: translateY(-37.5px);
+  background-color: #fcd116;
+}
+
+.second {
+  z-index: 2;
+  transform: translateY(-25px);
+  background-color: #d0d0d0;
+}
+
+.third {
+  z-index: 1;
+  transform: translateY(-12.5px);
+  background-color: #cd7f32;
+}
+
+.winner:hover {
+  transform: scale(1.1);
+}
+
+.podium .winner div {
+  margin-top: 15px;
 }
 </style>

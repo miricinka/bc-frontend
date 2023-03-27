@@ -185,7 +185,15 @@ async function deleteDay(date: IAttendanceDay) {
               </thead>
               <tbody>
                 <tr v-for="student in table.users">
-                  <th scope="row">{{ student.name }}</th>
+                  <th scope="row">
+                    <RouterLink
+                      :to="{
+                        name: 'user',
+                        params: { username: student.username },
+                      }"
+                      ><h2>{{ student.username }}</h2></RouterLink
+                    >
+                  </th>
                   <td v-for="date in table.attendanceDays">
                     <Checkbox
                       :disabled="loggedRole !== 'admin'"
