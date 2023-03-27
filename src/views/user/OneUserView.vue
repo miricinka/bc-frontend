@@ -161,7 +161,7 @@ async function edit(data: {
       <template #title
         ><div class="d-flex justify-content-between container my-3">
           Uživatel {{ username }}
-          <div>
+          <div class="user-buttons">
             <Button
               v-if="loggedUsername === props.username"
               label="Upravit údaje"
@@ -367,3 +367,12 @@ async function edit(data: {
     </Dialog>
   </div>
 </template>
+
+<style>
+.user-buttons {
+  margin: 5px;
+}
+.user-buttons Button {
+  margin: 2px;
+}
+</style>
