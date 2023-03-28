@@ -12,3 +12,23 @@ h2 {
 a {
   text-decoration: none;
 }
+
+.p-inputtext {
+  width: 70%;
+}
+
+.p-password {
+  width: 70% !important;
+}
+
+.p-password-input {
+  width: 100%;
+}
+
+.p-calendar {
+  width: 70% !important;
+}
+
+.p-inputnumber {
+  width: 70% !important;
+}

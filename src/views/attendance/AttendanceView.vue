@@ -224,7 +224,7 @@ async function deleteDay(date: IAttendanceDay) {
       :modal="true"
     >
       <div class="my-6 d-flex flex-row">
-        <div class="calendar m-2">
+        <div class="calendar-attendance m-2">
           <Calendar
             v-model="dates"
             selectionMode="multiple"
@@ -259,5 +259,9 @@ async function deleteDay(date: IAttendanceDay) {
 <style>
 .scrollable {
   overflow-x: auto;
+}
+
+.calendar-attendance .p-calendar {
+  width: 100% !important;
 }
 </style>

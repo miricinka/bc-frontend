@@ -376,24 +376,30 @@ async function updateEvent(name: string, date: Date, description: string) {
           <form
             @submit.prevent="storeEvent(form.name, form.date, form.description)"
           >
-            <div class="my-6">
-              <h5 id="text-area-text">Název</h5>
-              <InputText type="text" v-model="form.name" />
-              <h5 id="text-area-text">Datum</h5>
-              <Calendar
-                showIcon
-                :manualInput="false"
-                v-model="form.date"
-                dateFormat="dd. mm. yy"
-              />
-              <h5 id="text-area-text">Popis</h5>
-              <Textarea
-                v-model="form.description"
-                :autoResize="true"
-                rows="5"
-                cols="50"
-                aria-labelledby="text-area-text"
-              />
+            <div>
+              <div class="m-4">
+                <h5 id="text-area-text">Název</h5>
+                <InputText type="text" v-model="form.name" />
+              </div>
+              <div class="m-4">
+                <h5 id="text-area-text">Datum</h5>
+                <Calendar
+                  showIcon
+                  :manualInput="false"
+                  v-model="form.date"
+                  dateFormat="dd. mm. yy"
+                />
+              </div>
+              <div class="m-4">
+                <h5 id="text-area-text">Popis</h5>
+                <Textarea
+                  v-model="form.description"
+                  :autoResize="true"
+                  rows="5"
+                  cols="50"
+                  aria-labelledby="text-area-text"
+                />
+              </div>
             </div>
             <div>
               <Button
@@ -418,24 +424,30 @@ async function updateEvent(name: string, date: Date, description: string) {
               updateEvent(form.name, form.date, form.description)
             "
           >
-            <div class="my-6">
-              <h5 id="text-area-text">Název</h5>
-              <InputText type="text" v-model="form.name" />
-              <h5 id="text-area-text">Datum</h5>
-              <Calendar
-                showIcon
-                :manualInput="false"
-                v-model="form.date"
-                dateFormat="dd. mm. yy"
-              />
-              <h5 id="text-area-text">Popis</h5>
-              <Textarea
-                v-model="form.description"
-                :autoResize="true"
-                rows="5"
-                cols="50"
-                aria-labelledby="text-area-text"
-              />
+            <div>
+              <div class="m-4">
+                <h5 id="text-area-text">Název</h5>
+                <InputText type="text" v-model="form.name" />
+              </div>
+              <div class="m-4">
+                <h5 id="text-area-text">Datum</h5>
+                <Calendar
+                  showIcon
+                  :manualInput="false"
+                  v-model="form.date"
+                  dateFormat="dd. mm. yy"
+                />
+              </div>
+              <div class="m-4">
+                <h5 id="text-area-text">Popis</h5>
+                <Textarea
+                  v-model="form.description"
+                  :autoResize="true"
+                  rows="5"
+                  cols="50"
+                  aria-labelledby="text-area-text"
+                />
+              </div>
             </div>
             <div>
               <Button

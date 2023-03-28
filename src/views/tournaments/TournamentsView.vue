@@ -250,33 +250,38 @@ async function unsignUser(tournamentId: number) {
       </template>
     </Card>
     <Dialog
-      header="Nová aktivita"
+      header="Nový turnaj"
       v-model:visible="displayModal"
       :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
       :style="{ width: '50vw' }"
       :modal="true"
     >
       <form @submit.prevent="submit(form)">
-        <div class="my-6">
-          <h5 id="text-area-text">Název</h5>
-          <InputText type="text" v-model="form.title" />
-          <div class="field col-12 md:col-3">
+        <div>
+          <div class="m-4">
+            <h5 id="text-area-text">Název</h5>
+            <InputText type="text" v-model="form.title" />
+          </div>
+          <div class="m-4">
             <h5 id="text-area-text">Datum</h5>
             <Calendar
+              showIcon
               inputId="basic"
               v-model="form.date"
               autocomplete="off"
               dateFormat="dd. mm. yy"
             />
           </div>
-          <h5 id="text-area-text">Popis</h5>
-          <Textarea
-            v-model="form.description"
-            :autoResize="true"
-            rows="5"
-            cols="50"
-            aria-labelledby="text-area-text"
-          />
+          <div class="m-4">
+            <h5 id="text-area-text">Popis</h5>
+            <Textarea
+              v-model="form.description"
+              :autoResize="true"
+              rows="5"
+              cols="50"
+              aria-labelledby="text-area-text"
+            />
+          </div>
         </div>
         <div>
           <Button

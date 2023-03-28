@@ -339,10 +339,12 @@ async function deleteActivity(activity: IActivity) {
       :modal="true"
     >
       <form @submit.prevent="store(form)">
-        <div class="my-6">
-          <h5 id="text-area-text">Název</h5>
-          <InputText type="text" v-model="form.name" />
-          <div class="field col-12 md:col-3">
+        <div>
+          <div class="m-4">
+            <h5 id="text-area-text">Název</h5>
+            <InputText type="text" v-model="form.name" />
+          </div>
+          <div class="m-4">
             <h5 id="text-area-text">Váha</h5>
             <InputNumber
               inputId="minmax-buttons"
@@ -353,23 +355,25 @@ async function deleteActivity(activity: IActivity) {
               :max="100"
             />
           </div>
-          <h5 id="text-area-text">Popis</h5>
-          <Textarea
-            v-model="form.description"
-            :autoResize="true"
-            rows="5"
-            cols="50"
-            aria-labelledby="text-area-text"
-          />
+          <div class="m-4">
+            <h5 id="text-area-text">Popis</h5>
+            <Textarea
+              v-model="form.description"
+              :autoResize="true"
+              rows="5"
+              cols="50"
+              aria-labelledby="text-area-text"
+            />
+          </div>
         </div>
-        <div>
+        <div class="m-4">
           <Button
             label="Zpět"
             icon="pi pi-times"
             @click="closeModal()"
             class="p-button-text"
           />
-          <Button label="Přidat Aktualitu" icon="pi pi-check" type="submit" />
+          <Button label="Přidat Aktivitu" icon="pi pi-check" type="submit" />
         </div>
       </form>
     </Dialog>

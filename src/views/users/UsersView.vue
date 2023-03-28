@@ -234,75 +234,85 @@ async function edit(data: {
       :modal="true"
     >
       <form @submit.prevent="submit(newUserForm)">
-        <div class="my-6 user-form">
-          <h5 id="text-area-text">Username</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.username"
-            :class="`${errors?.errors.username ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.username">
-              <small id="title-help" class="p-error">{{
-                errors.errors.username[0]
-              }}</small>
+        <div class="user-form">
+          <div class="m-4">
+            <h5 id="text-area-text">Username</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.username"
+              :class="`${errors?.errors.username ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.username">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.username[0]
+                }}</small>
+              </div>
             </div>
           </div>
-          <h5 id="text-area-text">email</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.email"
-            :class="`${errors?.errors.email ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.email">
-              <small id="title-help" class="p-error">{{
-                errors.errors.email[0]
-              }}</small>
+          <div class="m-4">
+            <h5 id="text-area-text">email</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.email"
+              :class="`${errors?.errors.email ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.email">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.email[0]
+                }}</small>
+              </div>
             </div>
           </div>
-          <h5 id="text-area-text">Jméno</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.name"
-            :class="`${errors?.errors.name ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.name">
-              <small id="title-help" class="p-error">{{
-                errors.errors.name[0]
-              }}</small>
+          <div class="m-4">
+            <h5 id="text-area-text">Jméno</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.name"
+              :class="`${errors?.errors.name ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.name">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.name[0]
+                }}</small>
+              </div>
             </div>
           </div>
-          <h5 id="text-area-text">Příjmení</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.surname"
-            :class="`${errors?.errors.surname ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.surname">
-              <small id="title-help" class="p-error">{{
-                errors.errors.surname[0]
-              }}</small>
+          <div class="m-4">
+            <h5 id="text-area-text">Příjmení</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.surname"
+              :class="`${errors?.errors.surname ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.surname">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.surname[0]
+                }}</small>
+              </div>
             </div>
           </div>
-          <h5 id="text-area-text">Heslo</h5>
-          <Password
-            v-model="newUserForm.password"
-            :feedback="false"
-            toggleMask
-            :class="`${errors?.errors.password ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.password">
-              <small id="title-help" class="p-error">{{
-                errors.errors.password[0]
-              }}</small>
+          <div class="m-4">
+            <h5 id="text-area-text">Heslo</h5>
+            <Password
+              v-model="newUserForm.password"
+              :feedback="false"
+              toggleMask
+              :class="`${errors?.errors.password ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.password">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.password[0]
+                }}</small>
+              </div>
             </div>
           </div>
         </div>
-        <div>
+        <div class="m-4">
           <Button
             label="Zpět"
             icon="pi pi-times"
@@ -321,55 +331,63 @@ async function edit(data: {
       :modal="true"
     >
       <form @submit.prevent="edit(newUserForm)">
-        <div class="my-6 user-form">
-          <h5 id="text-area-text">Username</h5>
-          <InputText
-            type="text"
-            disabled="true"
-            v-model="newUserForm.username"
-            :class="`${errors?.errors.username ? 'p-invalid' : ''}`"
-          />
-          <h5 id="text-area-text">email</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.email"
-            :class="`${errors?.errors.email ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.email">
-              <small id="title-help" class="p-error">{{
-                errors.errors.email[0]
-              }}</small>
+        <div class="user-form">
+          <div class="m-4">
+            <h5 id="text-area-text">Username</h5>
+            <InputText
+              type="text"
+              disabled="true"
+              v-model="newUserForm.username"
+              :class="`${errors?.errors.username ? 'p-invalid' : ''}`"
+            />
+          </div>
+          <div class="m-4">
+            <h5 id="text-area-text">email</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.email"
+              :class="`${errors?.errors.email ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.email">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.email[0]
+                }}</small>
+              </div>
             </div>
           </div>
-          <h5 id="text-area-text">Jméno</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.name"
-            :class="`${errors?.errors.name ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.name">
-              <small id="title-help" class="p-error">{{
-                errors.errors.name[0]
-              }}</small>
+          <div class="m-4">
+            <h5 id="text-area-text">Jméno</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.name"
+              :class="`${errors?.errors.name ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.name">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.name[0]
+                }}</small>
+              </div>
             </div>
           </div>
-          <h5 id="text-area-text">Příjmení</h5>
-          <InputText
-            type="text"
-            v-model="newUserForm.surname"
-            :class="`${errors?.errors.surname ? 'p-invalid' : ''}`"
-          />
-          <div v-if="errors">
-            <div v-if="errors.errors.surname">
-              <small id="title-help" class="p-error">{{
-                errors.errors.surname[0]
-              }}</small>
+          <div class="m-4">
+            <h5 id="text-area-text">Příjmení</h5>
+            <InputText
+              type="text"
+              v-model="newUserForm.surname"
+              :class="`${errors?.errors.surname ? 'p-invalid' : ''}`"
+            />
+            <div v-if="errors">
+              <div v-if="errors.errors.surname">
+                <small id="title-help" class="p-error">{{
+                  errors.errors.surname[0]
+                }}</small>
+              </div>
             </div>
           </div>
         </div>
-        <div>
+        <div class="m-4">
           <Button
             label="Zpět"
             icon="pi pi-times"
@@ -383,16 +401,4 @@ async function edit(data: {
   </div>
 </template>
 
-<style>
-div.user-form .p-inputtext {
-  width: 70%;
-}
-
-div.user-form .p-password {
-  width: 70% !important;
-}
-
-div.user-form .p-password-input {
-  width: 100%;
-}
-</style>
+<style></style>

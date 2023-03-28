@@ -125,11 +125,20 @@ export interface ILoginResponse {
   data: IToken;
 }
 
+export interface IInfoTournament {
+  id: string;
+  title: string;
+  date: string;
+}
+
 export interface IInfo {
   activities: IActivity[];
   doneActivities: { name: string; weight: number }[];
   attendance: IAttendanceDay[];
   attended: { id: number }[];
+  tournaments: IInfoTournament[];
+  order: number;
+  points: number;
 }
 
 export interface IUsernamePoints {

@@ -103,15 +103,6 @@ async function checkboxChange(
   showSkeleton.value = false;
 }
 
-function getUser(username: string): IUser | null {
-  if (tournament.value?.users) {
-    return (
-      tournament.value.users.find((user) => user.username === username) || null
-    );
-  }
-  return null;
-}
-
 /*
   opens modal
 */
@@ -543,7 +534,7 @@ function calculateRank(user: IUser) {
           </div>
         </template>
         <template v-else>
-          <ProgressSpinner></ProgressSpinner>
+          <TableLoading></TableLoading>
         </template>
       </template>
     </Card>

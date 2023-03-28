@@ -32,7 +32,6 @@ const userForm = reactive({
 
 const user = ref<IUser>();
 const info = ref<IInfo>();
-const points = ref<number>();
 
 onMounted(() => {
   getUser();
@@ -82,7 +81,6 @@ async function getUserInfo() {
     headers: { Authorization: `Bearer ${token.value}` },
   });
   info.value = response.data;
-  points.value = countPoints(info.value.doneActivities);
 }
 
 async function changePassword(data: {
@@ -109,15 +107,6 @@ async function changePassword(data: {
       life: 3000,
     });
   }
-}
-
-function countPoints(
-  array: {
-    name: string;
-    weight: number;
-  }[]
-): number {
-  return array.reduce((sum, activity) => sum + activity.weight, 0);
 }
 
 async function edit(data: {
@@ -180,27 +169,47 @@ async function edit(data: {
         </div>
       </template>
       <template #content>
-        <div class="row-user d-flex justify-content" v-if="user">
-          <div class="col-3">
-            <div class="podium-user">
-              <div class="winner-user">
-                <span class="position-user">1</span>
-                <div v-if="true">
-                  <h2>{{ user.username }}</h2>
-                  <h2>{{ points }} xp</h2>
+        <template v-if="user">
+          <div class="row-user d-flex justify-content">
+            <div class="col-3">
+              <div class="podium-user" v-if="info">
+                <div
+                  class="winner-user"
+                  :class="`${
+                    info.order === 1
+                      ? 'first'
+                      : info.order === 2
+                      ? 'second'
+                      : info.order === 3
+                      ? 'third'
+                      : 'other-order'
+                  }`"
+                >
+                  <span class="position-user">{{ info.order }}</span>
+                  <div>
+                    <h2>{{ user.username }}</h2>
+                    <h2 v-if="user.username !== 'admin'">
+                      {{ info.points }} xp
+                    </h2>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="col-7" v-if="info">
+              <h5>{{ user.name }}</h5>
+              <h5>{{ user.surname }}</h5>
+              <h5>{{ user.email }}</h5>
+              <span v-if="user.username !== 'admin'"
+                >Celkem získáno bodů: {{ info.points }}</span
+              >
+            </div>
           </div>
-          <div class="col-7">
-            <h5>{{ user.name }}</h5>
-            <h5>{{ user.surname }}</h5>
-            <h5>{{ user.email }}</h5>
-            Celkem získáno bodů: {{ points }}
-          </div>
-        </div>
+        </template>
+        <template v-else>
+          <TableLoading></TableLoading>
+        </template>
         <div v-if="user">
-          <TabView>
+          <TabView v-if="user.username !== 'admin'">
             <TabPanel header="Aktivity">
               <template v-if="info">
                 <div class="activities-scrollable">
@@ -264,7 +273,32 @@ async function edit(data: {
                 </div>
               </template>
             </TabPanel>
-            <TabPanel header="Turnaje"> </TabPanel>
+            <TabPanel header="Turnaje">
+              <template v-if="info">
+                <div class="activities-scrollable">
+                  <table class="table table-hover">
+                    <tbody>
+                      <tr v-for="tournament in info.tournaments">
+                        <th>
+                          {{
+                            `${new Date(tournament.date).toLocaleDateString()}`
+                          }}
+                        </th>
+                        <td>
+                          <RouterLink
+                            :to="{
+                              name: 'tournament',
+                              params: { id: tournament.id },
+                            }"
+                            ><h2>{{ tournament.title }}</h2></RouterLink
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </template>
+            </TabPanel>
           </TabView>
         </div>
       </template>
@@ -435,6 +469,10 @@ async function edit(data: {
 
 .third {
   background-color: #cd7f32;
+}
+
+.other-order {
+  background-color: #f2e58f;
 }
 
 .winner-user:hover {
