@@ -132,6 +132,7 @@ async function checkboxChange(activity: IActivity, student: IUser) {
         headers: { Authorization: `Bearer ${token.value}` },
       });
     }
+    getUsersPoints();
   }
 }
 
