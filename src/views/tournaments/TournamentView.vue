@@ -504,13 +504,16 @@ function calculateRank(user: IUser) {
                           >
                         </td>
                         <td>
-                          <RouterLink
-                            :to="{
-                              name: 'user',
-                              params: { username: result.winner },
-                            }"
-                            ><h2>{{ result.winner }}</h2></RouterLink
-                          >
+                          <template v-if="result.winner">
+                            <RouterLink
+                              :to="{
+                                name: 'user',
+                                params: { username: result.winner },
+                              }"
+                              ><h2>{{ result.winner }}</h2></RouterLink
+                            >
+                          </template>
+                          <template v-else> Remíza </template>
                         </td>
                         <td>
                           <template v-if="hasPGN(result)">
