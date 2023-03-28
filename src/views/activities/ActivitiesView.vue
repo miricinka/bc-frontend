@@ -192,6 +192,15 @@ async function deleteActivity(activity: IActivity) {
   }
   await getActivitiesUsers();
 }
+
+function redirectToUser(winner: IUsernamePoints | undefined) {
+  if (winner) {
+    router.push({
+      name: "user",
+      params: { username: winner.username },
+    });
+  }
+}
 </script>
 
 <template>
@@ -214,21 +223,23 @@ async function deleteActivity(activity: IActivity) {
           <TabView>
             <TabPanel header="Pořadí">
               <div class="podium">
-                <div class="winner second">
+                <div class="winner second" @click="redirectToUser(second)">
                   <span class="position">2</span>
                   <div v-if="second">
-                    <h2>{{ second.username }}</h2>
+                    <h2>
+                      {{ second.username }}
+                    </h2>
                     <h2>{{ second.activities_sum_weight }} xp</h2>
                   </div>
                 </div>
-                <div class="winner first">
+                <div class="winner first" @click="redirectToUser(first)">
                   <span class="position">1</span>
                   <div v-if="first">
                     <h2>{{ first.username }}</h2>
                     <h2>{{ first.activities_sum_weight }} xp</h2>
                   </div>
                 </div>
-                <div class="winner third">
+                <div class="winner third" @click="redirectToUser(third)">
                   <span class="position">3</span>
                   <div v-if="third">
                     <h2>{{ third.username }}</h2>
@@ -412,6 +423,7 @@ table td {
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .position {

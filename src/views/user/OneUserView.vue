@@ -177,11 +177,11 @@ async function edit(data: {
                   class="winner-user"
                   :class="`${
                     info.order === 1
-                      ? 'first'
+                      ? 'first-user'
                       : info.order === 2
-                      ? 'second'
+                      ? 'second-user'
                       : info.order === 3
-                      ? 'third'
+                      ? 'third-user'
                       : 'other-order'
                   }`"
                 >
@@ -459,15 +459,15 @@ async function edit(data: {
   border-radius: 50%;
 }
 
-.first {
+.first-user {
   background-color: #fcd116;
 }
 
-.second {
+.second-user {
   background-color: #d0d0d0;
 }
 
-.third {
+.third-user {
   background-color: #cd7f32;
 }
 
