@@ -14,11 +14,13 @@ const loggedRole = ref(localStorage.getItem("role"));
 const token = ref(localStorage.getItem("token"));
 
 const news = ref<INewsWithComment[]>([]);
+const searchedNews = ref<INewsWithComment[]>([]);
 const visibleNews = ref<INewsWithComment[]>([]);
 const visibleUpcomingEvents = ref<IEvent[]>([]);
 const visiblePassedEvents = ref<IEvent[]>([]);
 const events = ref<IEventResponse>();
 const editingEvent = ref<IEvent>();
+const searchValue = ref<string>("");
 
 const displayAddEventModal = ref<boolean>(false);
 const displayEditEventModal = ref<boolean>(false);
@@ -44,7 +46,20 @@ async function getNews() {
     "http://127.0.0.1:8000/api/news"
   );
   news.value = response.data;
+  searchedNews.value = news.value;
   visibleNews.value = news.value.slice(0, 3);
+}
+
+/*
+searches value typed in by user in news title and text
+*/
+function searchNews(searchValue: string) {
+  searchedNews.value = news.value.filter(
+    (news) =>
+      news.news.text.includes(searchValue) ||
+      news.news.title.includes(searchValue)
+  );
+  visibleNews.value = searchedNews.value.slice(0, 3);
 }
 
 /*
@@ -77,9 +92,6 @@ const deleteNews = async (id: number) => {
     life: 3000,
   });
   await getNews();
-  if (news.value) {
-    visibleNews.value = news.value.slice(0, 3);
-  }
 };
 
 /*
@@ -87,7 +99,10 @@ pagination - updates visible news
 */
 function onNewsPage(event: PageState) {
   if (news.value) {
-    visibleNews.value = news.value.slice(event.first, event.first + event.rows);
+    visibleNews.value = searchedNews.value.slice(
+      event.first,
+      event.first + event.rows
+    );
   }
 }
 
@@ -304,13 +319,30 @@ async function updateEvent(name: string, date: Date, description: string) {
               <template #title>
                 <div class="d-flex justify-content-between container my-3">
                   Aktuality
-                  <Button
-                    v-if="loggedRole === 'admin'"
-                    @click="$router.push('/createNews')"
-                    label="Nová aktualita"
-                    class="p-button-raised p-button-success"
-                    icon="pi pi-plus"
-                  />
+                  <div class="d-flex">
+                    <div class="home-search">
+                      <div class="p-inputgroup flex-1">
+                        <InputText
+                          placeholder="Hledat…"
+                          v-model="searchValue"
+                        />
+                        <Button
+                          icon="pi pi-search"
+                          severity="warning"
+                          @click="searchNews(searchValue)"
+                        />
+                      </div>
+                    </div>
+                    <div class="mx-2">
+                      <Button
+                        v-if="loggedRole === 'admin'"
+                        @click="$router.push('/createNews')"
+                        label="Nová aktualita"
+                        class="p-button-raised p-button-success"
+                        icon="pi pi-plus"
+                      />
+                    </div>
+                  </div>
                 </div>
               </template>
               <template #content>
@@ -328,7 +360,7 @@ async function updateEvent(name: string, date: Date, description: string) {
                   </div>
                   <Paginator
                     :rows="3"
-                    :totalRecords="news?.length"
+                    :totalRecords="searchedNews?.length"
                     @page="onNewsPage($event)"
                   ></Paginator>
                 </div>
