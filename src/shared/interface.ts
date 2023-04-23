@@ -115,6 +115,11 @@ export interface IEvent {
   description: string;
 }
 
+export interface IEventResponse {
+  upcoming: IEvent[];
+  passed: IEvent[];
+}
+
 export interface IToken {
   token: string;
   username: string;

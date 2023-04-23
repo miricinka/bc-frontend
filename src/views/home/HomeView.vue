@@ -3,7 +3,11 @@ import { onMounted, reactive, ref } from "vue";
 import type { PageState } from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
-import type { IEvent, INewsWithComment } from "@/shared/interface";
+import type {
+  IEvent,
+  IEventResponse,
+  INewsWithComment,
+} from "@/shared/interface";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
@@ -11,8 +15,9 @@ const token = ref(localStorage.getItem("token"));
 
 const news = ref<INewsWithComment[]>([]);
 const visibleNews = ref<INewsWithComment[]>([]);
-const visibleEvents = ref<IEvent[]>([]);
-const events = ref<IEvent[]>();
+const visibleUpcomingEvents = ref<IEvent[]>([]);
+const visiblePassedEvents = ref<IEvent[]>([]);
+const events = ref<IEventResponse>();
 const editingEvent = ref<IEvent>();
 
 const displayAddEventModal = ref<boolean>(false);
@@ -87,11 +92,23 @@ function onNewsPage(event: PageState) {
 }
 
 /*
-pagination - updates visible events
+pagination - updates visible upcoming events
 */
-function onEventPage(event: PageState) {
+function onUpcomingEventPage(event: PageState) {
   if (events.value) {
-    visibleEvents.value = events.value.slice(
+    visibleUpcomingEvents.value = events.value.upcoming.slice(
+      event.first,
+      event.first + event.rows
+    );
+  }
+}
+
+/*
+pagination - updates visible passed events
+*/
+function onPassedEventPage(event: PageState) {
+  if (events.value) {
+    visiblePassedEvents.value = events.value.passed.slice(
       event.first,
       event.first + event.rows
     );
@@ -102,10 +119,13 @@ function onEventPage(event: PageState) {
 gets events from server
 */
 async function getEvents() {
-  const response = await axios.get<IEvent[]>("http://127.0.0.1:8000/api/event");
+  const response = await axios.get<IEventResponse>(
+    "http://127.0.0.1:8000/api/event"
+  );
   events.value = response.data;
   if (events.value) {
-    visibleEvents.value = events.value.slice(0, 4);
+    visibleUpcomingEvents.value = events.value.upcoming.slice(0, 4);
+    visiblePassedEvents.value = events.value.passed.slice(0, 4);
   }
 }
 
@@ -339,22 +359,49 @@ async function updateEvent(name: string, date: Date, description: string) {
                 </template>
                 <template #content>
                   <template v-if="events">
-                    <template v-if="events.length === 0"> Zadne akce </template>
+                    <template
+                      v-if="
+                        events.upcoming.length === 0 &&
+                        events.passed.length === 0
+                      "
+                    >
+                      Žádné akce
+                    </template>
                     <div class="events">
-                      <Event
-                        v-for="event in visibleEvents"
-                        :name="event.name"
-                        :date="event.date"
-                        :description="event.description"
-                        :role="loggedRole"
-                        @edit="openEditEventModal(event.id)"
-                        @delete="deleteEvent(event.id)"
-                      ></Event>
-                      <Paginator
-                        :rows="4"
-                        :totalRecords="events?.length"
-                        @page="onEventPage($event)"
-                      ></Paginator>
+                      <TabView>
+                        <TabPanel header="Nadcházející">
+                          <Event
+                            v-for="event in visibleUpcomingEvents"
+                            :name="event.name"
+                            :date="event.date"
+                            :description="event.description"
+                            :role="loggedRole"
+                            @edit="openEditEventModal(event.id)"
+                            @delete="deleteEvent(event.id)"
+                          ></Event>
+                          <Paginator
+                            :rows="4"
+                            :totalRecords="events.upcoming.length"
+                            @page="onUpcomingEventPage($event)"
+                          ></Paginator>
+                        </TabPanel>
+                        <TabPanel header="Minulé">
+                          <Event
+                            v-for="event in visiblePassedEvents"
+                            :name="event.name"
+                            :date="event.date"
+                            :description="event.description"
+                            :role="loggedRole"
+                            @edit="openEditEventModal(event.id)"
+                            @delete="deleteEvent(event.id)"
+                          ></Event>
+                          <Paginator
+                            :rows="4"
+                            :totalRecords="events.passed.length"
+                            @page="onPassedEventPage($event)"
+                          ></Paginator>
+                        </TabPanel>
+                      </TabView>
                     </div>
                   </template>
                   <template v-else>
