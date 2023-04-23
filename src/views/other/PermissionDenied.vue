@@ -7,6 +7,9 @@
           Přístup odepřen
         </div>
       </template>
+      <template #content>
+        K přístupu na tuto stránku nemáte dostatečná práva.
+      </template>
     </Card>
   </div>
 </template>

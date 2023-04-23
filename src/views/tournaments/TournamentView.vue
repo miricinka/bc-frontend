@@ -30,6 +30,9 @@ const form = reactive({
 });
 
 onMounted(() => {
+  if (!token.value) {
+    router.push("/notAuth");
+  }
   getTournament();
 });
 

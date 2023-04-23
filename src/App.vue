@@ -76,7 +76,7 @@ async function logout() {
       summary: "Úspěšně odhlášeno",
       life: 3000,
     });
-    router.push("/");
+    router.go(0);
   } catch (error) {
     toast.add({
       severity: "error",
@@ -133,7 +133,7 @@ async function logout() {
               >Docházka</RouterLink
             >
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="loggedRole">
             <RouterLink
               to="/tournaments"
               class="nav-link"

@@ -3,6 +3,7 @@ import type { ITournament } from "@/shared/interface";
 import axios from "axios";
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
+import router from "@/router";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
@@ -10,6 +11,9 @@ const loggedUsername = ref(localStorage.getItem("username"));
 const token = ref(localStorage.getItem("token"));
 
 onMounted(() => {
+  if (!token.value) {
+    router.push("/notAuth");
+  }
   getTournaments();
 });
 
