@@ -105,7 +105,7 @@ async function getEvents() {
   const response = await axios.get<IEvent[]>("http://127.0.0.1:8000/api/event");
   events.value = response.data;
   if (events.value) {
-    visibleEvents.value = events.value.slice(0, 3);
+    visibleEvents.value = events.value.slice(0, 4);
   }
 }
 
@@ -351,7 +351,7 @@ async function updateEvent(name: string, date: Date, description: string) {
                         @delete="deleteEvent(event.id)"
                       ></Event>
                       <Paginator
-                        :rows="3"
+                        :rows="4"
                         :totalRecords="events?.length"
                         @page="onEventPage($event)"
                       ></Paginator>
