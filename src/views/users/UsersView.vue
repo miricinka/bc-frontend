@@ -3,6 +3,7 @@ import type { IStoreUserError, IUser } from "@/shared/interface";
 import axios, { AxiosError } from "axios";
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
+import router from "@/router";
 
 const toast = useToast();
 
@@ -22,6 +23,9 @@ const newUserForm = reactive({
 const errors = ref<IStoreUserError>();
 
 onMounted(() => {
+  if (!token.value) {
+    router.push("/notAuth");
+  }
   getUsers();
 });
 
