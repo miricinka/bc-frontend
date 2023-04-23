@@ -35,10 +35,21 @@ function closeModal() {
 }
 
 async function getTournaments() {
-  const response = await axios.get<ITournament[]>(
-    "http://127.0.0.1:8000/api/tournament"
-  );
-  tournaments.value = response.data;
+  try {
+    const response = await axios<ITournament[]>({
+      method: "get",
+      url: "http://127.0.0.1:8000/api/tournament/",
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    tournaments.value = response.data;
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Turnament",
+      detail: "Turnaje se nepodařilo načíst",
+      life: 3000,
+    });
+  }
 }
 
 async function submit(data: { title: string; date: any; description: string }) {
