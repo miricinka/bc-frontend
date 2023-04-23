@@ -212,7 +212,7 @@ function redirectToUser(winner: IUsernamePoints | undefined) {
           Aktivity
           <Button
             v-if="loggedRole === 'admin'"
-            label="Přidat aktualitu"
+            label="Přidat aktivitu"
             icon="pi pi-plus"
             class="p-button-raised p-button-success"
             @click="openModal()"
