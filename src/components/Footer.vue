@@ -33,7 +33,7 @@
             height="132"
             style="border: 0"
             loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
+            referrerpolicy="no-referrer-when-downgrade, SameSite=None; Secure"
           ></iframe>
         </div>
       </div>

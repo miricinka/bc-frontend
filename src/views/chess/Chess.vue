@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { TheChessboard } from "vue3-chessboard";
 import "vue3-chessboard/style.css";
 import type { ChessboardAPI, BoardConfig } from "vue3-chessboard";
@@ -67,16 +67,6 @@ async function getGame(id: string) {
   game.value = response.data;
   pgn.value = game.value.pgn;
   loadNewPgn();
-}
-
-function handleCheckmate(isMated: string) {
-  if (isMated === "w") {
-    console.log("Black wins!");
-    alert("Black wins!");
-  } else {
-    console.log("White wins!");
-    alert("White wins!");
-  }
 }
 
 function reset() {
@@ -166,7 +156,6 @@ function loadNewPgn(): void {
             <TheChessboard
               :board-config="boardConfig"
               @board-created="(api) => (boardAPI = api)"
-              @checkmate="handleCheckmate"
             />
           </div>
           <div class="board-controls-pgn">
@@ -222,6 +211,9 @@ function loadNewPgn(): void {
 </template>
 
 <style>
+div.chessboard div.main-board {
+  cursor: default !important;
+}
 .board-controls-pgn {
   margin: 5px;
 }
