@@ -245,6 +245,7 @@ function calculateRank(user: IUser) {
     .map((u) => ({ user: u.username, points: calculatePoints(u) }))
     .sort((a, b) => b.points - a.points);
 
+  //todo
   return sortedUsers.findIndex((u) => u.user === user.username) + 1;
 }
 </script>
@@ -594,5 +595,9 @@ div.tournament-table table td {
 div.games h4 {
   font-size: 1.3rem;
   font-weight: 700;
+}
+
+div.tournament-table label {
+  margin-left: 5px;
 }
 </style>

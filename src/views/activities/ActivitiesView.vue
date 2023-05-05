@@ -283,11 +283,20 @@ function redirectToUser(winner: IUsernamePoints | undefined) {
                         <div class="d-flex flex-column">
                           <span>
                             {{ activity.name }}
+                          </span>
+                          <span> {{ activity.weight }} xp </span>
+                          <div>
                             <Button
                               v-if="loggedRole === 'admin'"
                               icon="pi pi-trash"
                               @click="deleteActivity(activity)"
                               class="p-button-danger p-button-sm"
+                            />
+                            <Button
+                              v-if="loggedRole === 'admin'"
+                              icon="pi pi-file-edit"
+                              @click=""
+                              class="p-button-success p-button-sm"
                             />
                             <Button
                               v-tooltip.top.focus="
@@ -300,8 +309,7 @@ function redirectToUser(winner: IUsernamePoints | undefined) {
                               icon="pi pi-question-circle"
                               class="p-button-sm"
                             />
-                          </span>
-                          <span> {{ activity.weight }} xp </span>
+                          </div>
                         </div>
                       </th>
                       <th scope="col">Celkem</th>

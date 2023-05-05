@@ -46,6 +46,13 @@ const props = defineProps<Props>();
                 </template>
                 <Button
                   v-if="role === 'admin'"
+                  label="Upravit"
+                  icon="pi pi-file-edit"
+                  class="p-button-raised"
+                  @click="$emit('delete', id)"
+                ></Button>
+                <Button
+                  v-if="role === 'admin'"
                   label="Smazat"
                   icon="pi pi-trash"
                   class="p-button-raised p-button-danger"
