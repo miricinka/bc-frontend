@@ -30,9 +30,9 @@ const form = reactive({
   description: "",
 });
 
-/*
-loads news and events on component mount
-*/
+/**
+ * loads news and events on component mount
+ */
 onMounted(async () => {
   await getNews();
   if (news.value) {
@@ -41,9 +41,10 @@ onMounted(async () => {
   await getEvents();
 });
 
-/*
-loads news from server
-*/
+/**
+ * loads news from server
+ * prepares pagination
+ */
 async function getNews() {
   const response = await axios.get<INewsWithComment[]>(
     "http://127.0.0.1:8000/api/news"
@@ -53,9 +54,11 @@ async function getNews() {
   visibleNews.value = news.value.slice(0, 3);
 }
 
-/*
-searches value typed in by user in news title and text
-*/
+/**
+ * searches value typed in by user in news title and text
+ * updates pagination
+ * @param searchValue
+ */
 function searchNews(searchValue: string) {
   if (news.value) {
     searchedNews.value = news.value.filter(
@@ -67,10 +70,12 @@ function searchNews(searchValue: string) {
   }
 }
 
-/*
-deletes specific news by id and refreshes all news
-triggers success/error delete notification
-*/
+/**
+ * deletes specific news by id
+ * refreshes all news
+ * triggers success/error delete notification
+ * @param id
+ */
 const deleteNews = async (id: number) => {
   try {
     if (!window.confirm("Are you sure?")) {
@@ -99,9 +104,10 @@ const deleteNews = async (id: number) => {
   await getNews();
 };
 
-/*
-pagination - updates visible news
-*/
+/**
+ * pagination - updates visible news
+ * @param event
+ */
 function onNewsPage(event: PageState) {
   if (news.value) {
     visibleNews.value = searchedNews.value.slice(
@@ -111,9 +117,10 @@ function onNewsPage(event: PageState) {
   }
 }
 
-/*
-pagination - updates visible upcoming events
-*/
+/**
+ * pagination - updates visible events
+ * @param event
+ */
 function onUpcomingEventPage(event: PageState) {
   if (events.value) {
     visibleUpcomingEvents.value = events.value.upcoming.slice(
@@ -123,9 +130,10 @@ function onUpcomingEventPage(event: PageState) {
   }
 }
 
-/*
-pagination - updates visible passed events
-*/
+/**
+ * pagination - updates visible passed events
+ * @param event
+ */
 function onPassedEventPage(event: PageState) {
   if (events.value) {
     visiblePassedEvents.value = events.value.passed.slice(
@@ -135,9 +143,9 @@ function onPassedEventPage(event: PageState) {
   }
 }
 
-/*
-gets events from server
-*/
+/**
+ * gets events from server
+ */
 async function getEvents() {
   const response = await axios.get<IEventResponse>(
     "http://127.0.0.1:8000/api/event"
@@ -149,9 +157,10 @@ async function getEvents() {
   }
 }
 
-/*
-gets event from server by id
-*/
+/**
+ * gets event from server by id
+ * @param id
+ */
 async function getEvent(id: number) {
   const response = await axios.get<IEvent>(
     "http://127.0.0.1:8000/api/event/" + id
@@ -159,9 +168,12 @@ async function getEvent(id: number) {
   editingEvent.value = response.data;
 }
 
-/*
-after confirming pop-up window, deletes event by id
-*/
+/**
+ * after confirming pop-up window, deletes event by id
+ * shows notification
+ * reloads events
+ * @param id
+ */
 async function deleteEvent(id: number) {
   if (!window.confirm("Are you sure?")) {
     return;
@@ -190,34 +202,35 @@ async function deleteEvent(id: number) {
   await getEvents();
 }
 
-/*
-resets event form, sets default values
-*/
+/**
+ * resets event form, sets default values
+ */
 function resetEventForm() {
   form.name = "";
   form.date = new Date();
   form.description = "";
 }
 
-/*
-resets event form and opens add event modal
-*/
+/**
+ * resets event form and opens add event modal
+ */
 function openAddEventModal() {
   resetEventForm();
   displayAddEventModal.value = true;
 }
 
-/*
-resets event form and closes add event modal 
-*/
+/**
+ * resets event form and closes add event modal
+ */
 function closeAddEventModal() {
   resetEventForm();
   displayAddEventModal.value = false;
 }
 
-/*
-opens edit event modal and prefills the form
-*/
+/**
+ * opens edit event modal and prefills the form
+ * @param id
+ */
 async function openEditEventModal(id: number) {
   await getEvent(id);
   if (editingEvent.value) {
@@ -228,18 +241,25 @@ async function openEditEventModal(id: number) {
   displayEditEventModal.value = true;
 }
 
-/*
-closes edit event modal and resets the form
-*/
+/**
+ * closes edit event modal and resets the form
+ */
 function closeEditEventModal() {
   resetEventForm();
   editingEvent.value = undefined;
   displayEditEventModal.value = false;
 }
 
-/*
-stores event, triggers success/error notification and gets again all events
-*/
+/**
+ * stores event on server
+ * triggers success/error notification
+ * reloads events
+ * closes modal
+ *
+ * @param name
+ * @param date
+ * @param description
+ */
 async function storeEvent(name: string, date: Date, description: string) {
   try {
     await axios({
@@ -274,9 +294,16 @@ async function storeEvent(name: string, date: Date, description: string) {
   closeAddEventModal();
 }
 
-/*
-updates event, triggers success/error notification and refreshes all events
-*/
+/**
+ * updates event on server
+ * triggers success/error notification
+ * refreshes all events
+ * closes modal
+ *
+ * @param name
+ * @param date
+ * @param description
+ */
 async function updateEvent(name: string, date: Date, description: string) {
   if (editingEvent.value) {
     try {

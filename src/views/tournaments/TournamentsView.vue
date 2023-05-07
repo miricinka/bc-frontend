@@ -10,6 +10,10 @@ const loggedRole = ref(localStorage.getItem("role"));
 const loggedUsername = ref(localStorage.getItem("username"));
 const token = ref(localStorage.getItem("token"));
 
+/**
+ * checks if user is logged in to view tournament
+ * gets tournaments on component mount
+ */
 onMounted(() => {
   if (!token.value) {
     router.push("/notAuth");
@@ -28,29 +32,48 @@ const form = reactive({
   description: "",
 });
 
+/**
+ * resets tournament form
+ */
 function clearForm() {
   form.date = new Date();
   form.description = "";
   form.title = "";
 }
 
+/**
+ * opens create modal
+ */
 function openModal() {
   clearForm();
   displayModal.value = true;
 }
 
+/**
+ * closes create modal
+ */
 function closeModal() {
   displayModal.value = false;
 }
 
+/**
+ * opens edit modal
+ */
 function openEditModal() {
   displayEditModal.value = true;
 }
 
+/**
+ * closes edit modal
+ */
 function closeEditModal() {
   displayEditModal.value = false;
 }
 
+/**
+ * gets tournaments from server
+ * shows error notification if failed
+ */
 async function getTournaments() {
   try {
     const response = await axios<ITournament[]>({
@@ -69,6 +92,12 @@ async function getTournaments() {
   }
 }
 
+/**
+ * creates new tournament on server
+ * shows notification
+ * refreshes tournaments
+ * @param data
+ */
 async function submit(data: { title: string; date: any; description: string }) {
   data.date = new Date(
     data.date.getTime() - data.date.getTimezoneOffset() * 60000
@@ -103,6 +132,12 @@ async function submit(data: { title: string; date: any; description: string }) {
   });
 }
 
+/**
+ * handles edit tournament event by tournament component
+ * opens modal
+ * prefils form
+ * @param tournament
+ */
 async function editTournament(tournament: ITournament) {
   form.date = new Date(tournament.date);
   form.description = tournament.description;
@@ -111,6 +146,12 @@ async function editTournament(tournament: ITournament) {
   editingTournamentId = tournament.id;
 }
 
+/**
+ * edits tournament on server
+ * shows notification
+ * reloads tournaments
+ * @param data
+ */
 async function edit(data: { title: string; date: any; description: string }) {
   data.date = new Date(
     data.date.getTime() - data.date.getTimezoneOffset() * 60000
@@ -146,6 +187,12 @@ async function edit(data: { title: string; date: any; description: string }) {
   });
 }
 
+/**
+ * deletes tournament on server
+ * shows notification
+ * reloads tournaments
+ * @param tournament
+ */
 async function deleteTournament(tournament: ITournament) {
   if (!window.confirm("Opravdu chcete turnaj smazat?")) {
     return;
@@ -172,6 +219,12 @@ async function deleteTournament(tournament: ITournament) {
   }
 }
 
+/**
+ * sends request to server to sign user to tournament
+ * shows notif
+ * reloads tournaments
+ * @param tournamentId
+ */
 async function signUser(tournamentId: number) {
   try {
     await axios({
@@ -200,6 +253,12 @@ async function signUser(tournamentId: number) {
   await getTournaments();
 }
 
+/**
+ * sends request to server to unsign user to tournament
+ * shows notif
+ * reloads tournaments
+ * @param tournamentId
+ */
 async function unsignUser(tournamentId: number) {
   try {
     await axios({

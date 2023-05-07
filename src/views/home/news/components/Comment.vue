@@ -32,6 +32,7 @@ function toggleEdit() {
 /**
  * edit comment on server
  * display notification
+ * emits event to reload comments
  */
 async function editComment(text: string) {
   try {

@@ -17,8 +17,15 @@ const props = defineProps<Props>();
 const news = ref<INews>();
 const errors = ref<IStoreNewsError>();
 
+/**
+ * gets news from server on component mount
+ */
 onMounted(() => getNews(props.id));
 
+/**
+ * gets news from server
+ * @param id
+ */
 const getNews = async (id: string) => {
   const response = await axios.get<INews>(
     "http://127.0.0.1:8000/api/news/" + id
@@ -26,6 +33,12 @@ const getNews = async (id: string) => {
   news.value = response.data;
 };
 
+/**
+ * updates specific post on server
+ * shows notification
+ * redirects back to homepage
+ * @param id
+ */
 const updateNews = async (id: string) => {
   try {
     await axios({

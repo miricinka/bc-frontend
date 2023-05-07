@@ -16,6 +16,13 @@ const form = reactive({
   text: "",
 });
 
+/**
+ * stores new post on server
+ * displays notification
+ * redirects back to homepage
+ *
+ * @param data
+ */
 const store = async (data: { title: string; text: string }) => {
   try {
     await axios({

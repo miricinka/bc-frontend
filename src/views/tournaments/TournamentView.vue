@@ -29,6 +29,9 @@ const form = reactive({
   pgn: "",
 });
 
+/**
+ * gets tournaments if user is logged in
+ */
 onMounted(() => {
   if (!token.value) {
     router.push("/notAuth");
@@ -40,10 +43,10 @@ const tournament = ref<ITournament>();
 const results = ref<GameResult[]>([]);
 const PGNError = ref<boolean>(false);
 
-/*
-  gets tournament from the server
-  loads it to internal variable
-*/
+/**
+ * gets tournament from the server
+ * loads it to internal variable
+ */
 async function getTournament() {
   const response = await axios<ITournament>({
     method: "get",
@@ -57,11 +60,15 @@ async function getTournament() {
   });
 }
 
-/*
-  reacts to change in checkbox, 
-  sends the changed value to server
-  triggers success/error notification
-*/
+/**
+ * reacts to change in checkbox
+ * sends the changed value to server
+ * triggers success/error notification
+ *
+ * @param black
+ * @param white
+ * @param winner
+ */
 async function checkboxChange(
   black: string,
   white: string,
@@ -106,17 +113,20 @@ async function checkboxChange(
   showSkeleton.value = false;
 }
 
-/*
-  opens modal
-*/
+/**
+ * opens modal
+ * prefills form
+ * @param result
+ */
 function openPGNModal(result: GameResult) {
   form.black = result.black;
   form.white = result.white;
   displayModal.value = true;
 }
 
-/*
-  closes modal, resets form
+/**
+ * closes modal
+ * resets form
  */
 function closeModal() {
   displayModal.value = false;
@@ -124,9 +134,10 @@ function closeModal() {
   form.pgn = "";
 }
 
-/*
-  checks if this game has some pgn in order to show play button
-*/
+/**
+ * checks if this game has some pgn in order to show play button
+ * @param result
+ */
 function hasPGN(result: GameResult): boolean {
   if (tournament.value) {
     if (
@@ -143,10 +154,11 @@ function hasPGN(result: GameResult): boolean {
   return false;
 }
 
-/*
-  redirects to Chess screen and gives the game id as input param,
-  so the screen can first init the game with this pgn
-*/
+/**
+ * redirects to Chess screen and gives the game id as input param
+ * so the screen can first init the game with this pgn
+ * @param result
+ */
 function playPGN(result: GameResult) {
   let entry;
   if (tournament.value) {
@@ -158,9 +170,14 @@ function playPGN(result: GameResult) {
   router.push({ name: "chess", params: { id: entry?.id } });
 }
 
-/*
-  uploads pgn, but first it checks if its valid pgn
-*/
+/**
+ * uploads pgn, but first it checks if its valid pgn
+ * shows success/error notification
+ *
+ * @param black
+ * @param white
+ * @param pgn
+ */
 async function uploadPGN(black: string, white: string, pgn: string) {
   PGNError.value = false;
   if (!pgn || pgn === "") {
@@ -218,9 +235,10 @@ async function uploadPGN(black: string, white: string, pgn: string) {
   closeModal();
 }
 
-/*
-  Calculates gained points for user 
-*/
+/**
+ * Calculates gained points for user
+ * @param user
+ */
 function calculatePoints(user: IUser): number {
   const games = results.value;
 
@@ -234,9 +252,10 @@ function calculatePoints(user: IUser): number {
   return wonGames + tieGames / 2;
 }
 
-/*
-  Calculates rank for user by his gained points
-*/
+/**
+ * Calculates rank for user by his gained points
+ * @param user
+ */
 function calculateRank(user: IUser) {
   const users = tournament.value?.users;
   if (!users) return;
@@ -245,7 +264,6 @@ function calculateRank(user: IUser) {
     .map((u) => ({ user: u.username, points: calculatePoints(u) }))
     .sort((a, b) => b.points - a.points);
 
-  //todo
   return sortedUsers.findIndex((u) => u.user === user.username) + 1;
 }
 </script>

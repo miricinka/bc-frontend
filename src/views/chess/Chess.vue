@@ -36,6 +36,11 @@ const pgn = ref(
 );
 const PGNError = ref<boolean>(false);
 
+/**
+ * if there is a specific id for chess game
+ * checks if user is logged in to view
+ * or redirects to page not found
+ */
 onMounted(() => {
   if (props.id) {
     if (!token.value) {
@@ -58,6 +63,12 @@ var isPrevDisabled = ref(true);
 chess.reset();
 currentFen.value = chess.fen();
 
+/**
+ *
+ * gets specific game from server
+ * and loads it to abstract game
+ * @param id
+ */
 async function getGame(id: string) {
   const response = await axios<IGame>({
     method: "get",
@@ -69,6 +80,9 @@ async function getGame(id: string) {
   loadNewPgn();
 }
 
+/**
+ * handles reset game triggered by user
+ */
 function reset() {
   index.value = 0;
   boardAPI.value?.resetBoard();
@@ -78,6 +92,9 @@ function reset() {
   currentComment.value = undefined;
 }
 
+/**
+ * handles last move triggered by user
+ */
 function lastMove() {
   isNextDisabled.value = false;
   boardAPI.value?.undoLastMove();
@@ -95,6 +112,9 @@ function lastMove() {
   console.log(index.value);
 }
 
+/**
+ * handles next move triggered by user
+ */
 function nextMove() {
   isPrevDisabled.value = false;
   if (history.value) {
@@ -116,6 +136,11 @@ function nextMove() {
   }
 }
 
+/**
+ * tries to load new pgn to abstract game
+ * displays success/error notification
+ * parses comments
+ */
 function loadNewPgn(): void {
   try {
     chess.loadPgn(pgn.value);

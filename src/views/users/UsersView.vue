@@ -22,6 +22,9 @@ const newUserForm = reactive({
 
 const errors = ref<IStoreUserError>();
 
+/**
+ * shows users page if logged in
+ */
 onMounted(() => {
   if (!token.value) {
     router.push("/notAuth");
@@ -32,15 +35,25 @@ onMounted(() => {
 const displayAddModal = ref(false);
 const displayEditModal = ref(false);
 
+/**
+ * opends add user modal
+ */
 function openAddModal() {
   displayAddModal.value = true;
 }
 
+/**
+ * closes add user modal
+ */
 function closeAddModal() {
   displayAddModal.value = false;
   resetForm();
 }
 
+/**
+ * opens edit user info modal
+ * prefills form
+ */
 function openEditModal(user: IUser) {
   displayEditModal.value = true;
   (newUserForm.email = user.email),
@@ -49,10 +62,16 @@ function openEditModal(user: IUser) {
     (newUserForm.surname = user.surname);
 }
 
+/**
+ * closes edit user info modal
+ */
 function closeEditModal() {
   displayEditModal.value = false;
 }
 
+/**
+ * resets user info form
+ */
 function resetForm() {
   (newUserForm.email = ""),
     (newUserForm.username = ""),
@@ -61,6 +80,9 @@ function resetForm() {
     (newUserForm.password = "");
 }
 
+/**
+ * gets users from server
+ */
 async function getUsers() {
   const response = await axios<IUser[]>({
     method: "get",
@@ -70,6 +92,11 @@ async function getUsers() {
   users.value = response.data;
 }
 
+/**
+ * deletes specific user on server
+ * shows notification
+ * @param username
+ */
 async function deleteUser(username: string) {
   if (!window.confirm("Opravdu chcete uživatele smazat?")) {
     return;
@@ -98,6 +125,12 @@ async function deleteUser(username: string) {
   });
 }
 
+/**
+ * adds new user on server
+ * reloads users
+ * shows notifications
+ * @param data
+ */
 async function submit(data: {
   username: string;
   name: string;
@@ -136,6 +169,13 @@ async function submit(data: {
   });
 }
 
+/**
+ * edits user info on server
+ * shows notifications
+ * reloads users
+ *
+ * @param data
+ */
 async function edit(data: {
   username: string;
   name: string;

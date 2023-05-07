@@ -5,7 +5,7 @@ import type {
   IUser,
   IUserActivityTable,
 } from "@/shared/interface";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 import router from "@/router";
@@ -20,6 +20,9 @@ const second = ref<IUsernamePoints>();
 const third = ref<IUsernamePoints>();
 const otherUsers = ref<IUsernamePoints[]>();
 
+/**
+ * get activities, users and points on component mount
+ */
 onMounted(() => {
   if (!token.value) {
     router.push("/notAuth");
@@ -57,6 +60,10 @@ const getActivitiesUsers = async () => {
   table.value = response.data;
 };
 
+/**
+ * gets user with counted points from server
+ * fills variables to show users on podium
+ */
 async function getUsersPoints() {
   const response = await axios({
     method: "get",
@@ -90,6 +97,10 @@ function countPoints(student: IUser): number {
   return sum;
 }
 
+/**
+ * gets activity weight based on its name
+ * @param activityName
+ */
 function getActivityWeight(activityName: string): number {
   let weight;
   if (table.value) {
@@ -103,6 +114,13 @@ function getActivityWeight(activityName: string): number {
   return 0;
 }
 
+/**
+ * reacts to change in checkbox by user
+ * and send corresponding request to server
+ *
+ * @param activity
+ * @param student
+ */
 async function checkboxChange(activity: IActivity, student: IUser) {
   if (table.value) {
     if (
@@ -136,6 +154,10 @@ async function checkboxChange(activity: IActivity, student: IUser) {
   }
 }
 
+/**
+ * stores newly created activity on server
+ * @param data
+ */
 const store = async (data: {
   name: string;
   weight: number;
@@ -166,6 +188,10 @@ const store = async (data: {
   }
 };
 
+/**
+ * deletes activity from server
+ * @param activity
+ */
 async function deleteActivity(activity: IActivity) {
   if (!window.confirm("Opravdu chcete aktivitu smazat?")) {
     return;
@@ -194,6 +220,10 @@ async function deleteActivity(activity: IActivity) {
   await getActivitiesUsers();
 }
 
+/**
+ * handels redirection to users profile
+ * @param winner
+ */
 function redirectToUser(winner: IUsernamePoints | undefined) {
   if (winner) {
     router.push({

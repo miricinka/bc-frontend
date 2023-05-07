@@ -13,6 +13,9 @@ const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const token = ref(localStorage.getItem("token"));
 
+/**
+ * gets attendence from server on component mount
+ */
 onMounted(() => {
   if (!token.value) {
     router.push("/notAuth");
@@ -25,15 +28,24 @@ const dates = ref<Date[]>([]);
 
 const table = ref<IAttendanceUserTable>();
 
+/**
+ * sets modal to open
+ */
 function openModal() {
   displayModal.value = true;
 }
 
+/**
+ * sets modal to closed
+ */
 function closeModal() {
   dates.value = [];
   displayModal.value = false;
 }
 
+/**
+ * gets attendance from server
+ */
 const getAttendance = async () => {
   const response = await axios({
     method: "get",
@@ -43,6 +55,11 @@ const getAttendance = async () => {
   table.value = response.data;
 };
 
+/**
+ * submits creatin of new attendance days to server
+ * shows corresponding notification
+ * closes modal
+ */
 async function submit() {
   if (dates.value.length <= 0) {
     toast.add({
@@ -86,6 +103,13 @@ async function submit() {
   closeModal();
 }
 
+/**
+ * reacts to change in checkbox for attendance
+ * and sends corresponding request to server
+ *
+ * @param day
+ * @param student
+ */
 async function checkboxChange(day: IAttendanceDay, student: IUser) {
   if (table.value) {
     if (
@@ -118,6 +142,13 @@ async function checkboxChange(day: IAttendanceDay, student: IUser) {
   }
 }
 
+/**
+ * deletes specific attendance day
+ * displays notification
+ * reloads attendance
+ *
+ * @param date
+ */
 async function deleteDay(date: IAttendanceDay) {
   if (!window.confirm("Opravdu tento den smazat?")) {
     return;

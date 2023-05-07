@@ -22,10 +22,17 @@ const newComment = ref<string>("");
 
 const errors = ref<IStoreCommentError>();
 
+/**
+ * gets post and comments from server on component mount
+ */
 onMounted(() => {
   getNews(props.id), getComments(props.id);
 });
 
+/**
+ * gets specific post from server
+ * @param id
+ */
 const getNews = async (id: string) => {
   const response = await axios.get<INews>(
     "http://127.0.0.1:8000/api/news/" + id
@@ -33,6 +40,10 @@ const getNews = async (id: string) => {
   news.value = response.data;
 };
 
+/**
+ * gets comments for specific post from server
+ * @param id
+ */
 const getComments = async (id: string) => {
   const response = await axios.get<IComment[]>(
     "http://127.0.0.1:8000/api/news/" + id + "/comments"
@@ -40,6 +51,13 @@ const getComments = async (id: string) => {
   comments.value = response.data;
 };
 
+/**
+ * sends new comment to server
+ * shows notification
+ * reloads comments
+ *
+ * @param comment
+ */
 const addComment = async (comment: string) => {
   try {
     await axios({
@@ -77,6 +95,13 @@ const addComment = async (comment: string) => {
   }
 };
 
+/**
+ * deletes comment from server
+ * shows notification
+ * reloads comments
+ *
+ * @param comment
+ */
 const deleteComment = async (id: number) => {
   console.log(id);
   if (!window.confirm("Are you sure?")) {
@@ -105,10 +130,12 @@ const deleteComment = async (id: number) => {
   }
 };
 
-/*
-deletes specific news by id and refreshes all news
-triggers success/error delete notification
-*/
+/**
+ * deletes specific news by id
+ * refreshes all news
+ * shows notification
+ * @param id
+ */
 const deleteNews = async (id: number) => {
   try {
     if (!window.confirm("Are you sure?")) {

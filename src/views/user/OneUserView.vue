@@ -33,20 +33,33 @@ const userForm = reactive({
 const user = ref<IUser>();
 const info = ref<IInfo>();
 
+/**
+ * gets user and his info on component mount
+ */
 onMounted(() => {
   getUser();
   getUserInfo();
 });
 
+/**
+ * opens password change modal
+ */
 function openPasswordModal() {
   displayPasswordModal.value = true;
 }
 
+/**
+ * closes password change modal
+ */
 function closePasswordModal() {
   displayPasswordModal.value = false;
   resetPasswordForm();
 }
 
+/**
+ * opens edit user info modal
+ * prefills form
+ */
 function openEditModal() {
   displayEditModal.value = true;
   if (user.value) {
@@ -57,14 +70,23 @@ function openEditModal() {
   }
 }
 
+/**
+ * closes edit user info modal
+ */
 function closeEditModal() {
   displayEditModal.value = false;
 }
 
+/**
+ * resets change psw form
+ */
 function resetPasswordForm() {
   (passwordForm.current_password = ""), (passwordForm.new_password = "");
 }
 
+/**
+ * gets user from server
+ */
 async function getUser() {
   const response = await axios<IUser>({
     method: "get",
@@ -74,6 +96,9 @@ async function getUser() {
   user.value = response.data;
 }
 
+/**
+ * gets user info from server
+ */
 async function getUserInfo() {
   const response = await axios<IInfo>({
     method: "get",
@@ -83,6 +108,13 @@ async function getUserInfo() {
   info.value = response.data;
 }
 
+/**
+ * sends change psw request to server
+ * shows notification
+ * closes modal
+ *
+ * @param data
+ */
 async function changePassword(data: {
   current_password: string;
   new_password: string;
@@ -109,6 +141,13 @@ async function changePassword(data: {
   }
 }
 
+/**
+ * edits user info on the server
+ * reloads data on page
+ * shows notification
+ *
+ * @param data
+ */
 async function edit(data: {
   username: string;
   name: string;
