@@ -33,6 +33,8 @@ onMounted(() => {
 
 const table = ref<IUserActivityTable>();
 const displayModal = ref(false);
+const displayEditModal = ref(false);
+let editingActivity = "";
 
 const form = reactive({
   name: "",
@@ -41,11 +43,31 @@ const form = reactive({
 });
 
 function openModal() {
+  resetForm();
   displayModal.value = true;
 }
 
 function closeModal() {
   displayModal.value = false;
+}
+
+function openUpdateModal(activity: IActivity) {
+  form.description = activity.description;
+  form.name = activity.name;
+  form.weight = activity.weight;
+  displayEditModal.value = true;
+  editingActivity = activity.name;
+}
+
+function closeUpdateModal() {
+  displayEditModal.value = false;
+  resetForm();
+}
+
+function resetForm() {
+  form.description = "";
+  form.name = "";
+  form.weight = 5;
 }
 
 /**
@@ -156,6 +178,9 @@ async function checkboxChange(activity: IActivity, student: IUser) {
 
 /**
  * stores newly created activity on server
+ * shows notification
+ * reloads table
+ * closes modal
  * @param data
  */
 const store = async (data: {
@@ -183,6 +208,43 @@ const store = async (data: {
       severity: "error",
       summary: "Aktivita",
       detail: "Aktivitu se nepodařilo vytvořit",
+      life: 3000,
+    });
+  }
+};
+
+/**
+ * edits activity on server
+ * shows notification
+ * reloads table
+ * closes modal
+ * @param data
+ */
+const edit = async (data: {
+  name: string;
+  weight: number;
+  description: string;
+}) => {
+  try {
+    await axios({
+      method: "put",
+      data: data,
+      url: "http://127.0.0.1:8000/api/activity/" + editingActivity,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    toast.add({
+      severity: "success",
+      summary: "Aktivita",
+      detail: "Aktivita upravena",
+      life: 3000,
+    });
+    await getActivitiesUsers();
+    closeUpdateModal();
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Aktivita",
+      detail: "Aktivitu se nepodařilo upravit",
       life: 3000,
     });
   }
@@ -221,7 +283,7 @@ async function deleteActivity(activity: IActivity) {
 }
 
 /**
- * handels redirection to users profile
+ * handles redirection to users profile
  * @param winner
  */
 function redirectToUser(winner: IUsernamePoints | undefined) {
@@ -325,7 +387,7 @@ function redirectToUser(winner: IUsernamePoints | undefined) {
                             <Button
                               v-if="loggedRole === 'admin'"
                               icon="pi pi-file-edit"
-                              @click=""
+                              @click="openUpdateModal(activity)"
                               class="p-button-success p-button-sm"
                             />
                             <Button
@@ -424,6 +486,53 @@ function redirectToUser(winner: IUsernamePoints | undefined) {
             class="p-button-text"
           />
           <Button label="Přidat Aktivitu" icon="pi pi-check" type="submit" />
+        </div>
+      </form>
+    </Dialog>
+
+    <Dialog
+      header="Upravit aktivitu"
+      v-model:visible="displayEditModal"
+      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+      :style="{ width: '50vw' }"
+      :modal="true"
+    >
+      <form @submit.prevent="edit(form)">
+        <div>
+          <div class="m-4">
+            <h5 id="text-area-text">Název</h5>
+            <InputText type="text" v-model="form.name" disabled="true" />
+          </div>
+          <div class="m-4">
+            <h5 id="text-area-text">Váha</h5>
+            <InputNumber
+              inputId="minmax-buttons"
+              v-model="form.weight"
+              mode="decimal"
+              showButtons
+              :min="0"
+              :max="10"
+            />
+          </div>
+          <div class="m-4">
+            <h5 id="text-area-text">Popis</h5>
+            <Textarea
+              v-model="form.description"
+              :autoResize="true"
+              rows="5"
+              cols="50"
+              aria-labelledby="text-area-text"
+            />
+          </div>
+        </div>
+        <div class="m-4">
+          <Button
+            label="Zpět"
+            icon="pi pi-times"
+            @click="closeModal()"
+            class="p-button-text"
+          />
+          <Button label="Upravit Aktivitu" icon="pi pi-check" type="submit" />
         </div>
       </form>
     </Dialog>
