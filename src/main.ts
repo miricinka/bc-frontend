@@ -39,7 +39,7 @@ import Tooltip from "primevue/tooltip";
 
 import News from "./components/News.vue";
 import Comment from "./components/Comment.vue";
-import Tournament from "./components/Tournament.vue";
+import Tournament from "./views/tournaments/components/Tournament.vue";
 import Event from "./components/Event.vue";
 import Footer from "./components/Footer.vue";
 
