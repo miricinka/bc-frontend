@@ -3,7 +3,6 @@ import axios, { AxiosError } from "axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 import type { IComment, IStoreCommentError, INews } from "@/shared/interface";
-import { routeLocationKey } from "vue-router";
 import router from "@/router";
 
 const toast = useToast();
