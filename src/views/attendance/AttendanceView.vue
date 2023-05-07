@@ -37,7 +37,7 @@ function closeModal() {
 const getAttendance = async () => {
   const response = await axios({
     method: "get",
-    url: "http://127.0.0.1:8000/api/attendanceUsersTable",
+    url: "http://127.0.0.1:8000/api/attendance",
     headers: { Authorization: `Bearer ${token.value}` },
   });
   table.value = response.data;
