@@ -51,6 +51,10 @@ function closeModal() {
   displayModal.value = false;
 }
 
+/**
+ * opens update modal
+ * @param activity
+ */
 function openUpdateModal(activity: IActivity) {
   form.description = activity.description;
   form.name = activity.name;
@@ -59,11 +63,18 @@ function openUpdateModal(activity: IActivity) {
   editingActivity = activity.name;
 }
 
+/**
+ * closes modal
+ * resets form
+ */
 function closeUpdateModal() {
   displayEditModal.value = false;
   resetForm();
 }
 
+/**
+ * resets form values
+ */
 function resetForm() {
   form.description = "";
   form.name = "";
