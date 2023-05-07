@@ -38,9 +38,9 @@ import Toast from "primevue/toast";
 import Tooltip from "primevue/tooltip";
 
 import News from "./views/home/news/components/News.vue";
-import Comment from "./components/Comment.vue";
+import Comment from "./views/home/news/components/Comment.vue";
 import Tournament from "./views/tournaments/components/Tournament.vue";
-import Event from "./components/Event.vue";
+import Event from "./views/home/news/components/Event.vue";
 import Footer from "./components/Footer.vue";
 
 import CardLoading from "./components/CardLoading.vue";
