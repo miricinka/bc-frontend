@@ -13,7 +13,7 @@ const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
 const token = ref(localStorage.getItem("token"));
 
-const news = ref<INewsWithComment[]>([]);
+const news = ref<INewsWithComment[]>();
 const searchedNews = ref<INewsWithComment[]>([]);
 const visibleNews = ref<INewsWithComment[]>([]);
 const visibleUpcomingEvents = ref<IEvent[]>([]);
@@ -54,12 +54,14 @@ async function getNews() {
 searches value typed in by user in news title and text
 */
 function searchNews(searchValue: string) {
-  searchedNews.value = news.value.filter(
-    (news) =>
-      news.news.text.includes(searchValue) ||
-      news.news.title.includes(searchValue)
-  );
-  visibleNews.value = searchedNews.value.slice(0, 3);
+  if (news.value) {
+    searchedNews.value = news.value.filter(
+      (news) =>
+        news.news.text.includes(searchValue) ||
+        news.news.title.includes(searchValue)
+    );
+    visibleNews.value = searchedNews.value.slice(0, 3);
+  }
 }
 
 /*
@@ -346,23 +348,26 @@ async function updateEvent(name: string, date: Date, description: string) {
                 </div>
               </template>
               <template #content>
-                <div v-if="visibleNews.length > 0">
-                  <div v-for="oneNews in visibleNews">
-                    <News
-                      :id="oneNews.news.id"
-                      :title="oneNews.news.title"
-                      :text="oneNews.news.text"
-                      :dateCreated="oneNews.news.created_at"
-                      :commentCount="oneNews.commentCount"
-                      :role="loggedRole"
-                      @delete="deleteNews"
-                    ></News>
+                <div v-if="news">
+                  <div v-if="news.length == 0">Žádné články</div>
+                  <div v-else-if="visibleNews.length > 0">
+                    <div v-for="oneNews in visibleNews">
+                      <News
+                        :id="oneNews.news.id"
+                        :title="oneNews.news.title"
+                        :text="oneNews.news.text"
+                        :dateCreated="oneNews.news.created_at"
+                        :commentCount="oneNews.commentCount"
+                        :role="loggedRole"
+                        @delete="deleteNews"
+                      ></News>
+                    </div>
+                    <Paginator
+                      :rows="3"
+                      :totalRecords="searchedNews?.length"
+                      @page="onNewsPage($event)"
+                    ></Paginator>
                   </div>
-                  <Paginator
-                    :rows="3"
-                    :totalRecords="searchedNews?.length"
-                    @page="onNewsPage($event)"
-                  ></Paginator>
                 </div>
                 <div v-else>
                   <CardLoading></CardLoading>
@@ -399,42 +404,44 @@ async function updateEvent(name: string, date: Date, description: string) {
                     >
                       Žádné akce
                     </template>
-                    <div class="events">
-                      <TabView>
-                        <TabPanel header="Nadcházející">
-                          <Event
-                            v-for="event in visibleUpcomingEvents"
-                            :name="event.name"
-                            :date="event.date"
-                            :description="event.description"
-                            :role="loggedRole"
-                            @edit="openEditEventModal(event.id)"
-                            @delete="deleteEvent(event.id)"
-                          ></Event>
-                          <Paginator
-                            :rows="4"
-                            :totalRecords="events.upcoming.length"
-                            @page="onUpcomingEventPage($event)"
-                          ></Paginator>
-                        </TabPanel>
-                        <TabPanel header="Minulé">
-                          <Event
-                            v-for="event in visiblePassedEvents"
-                            :name="event.name"
-                            :date="event.date"
-                            :description="event.description"
-                            :role="loggedRole"
-                            @edit="openEditEventModal(event.id)"
-                            @delete="deleteEvent(event.id)"
-                          ></Event>
-                          <Paginator
-                            :rows="4"
-                            :totalRecords="events.passed.length"
-                            @page="onPassedEventPage($event)"
-                          ></Paginator>
-                        </TabPanel>
-                      </TabView>
-                    </div>
+                    <template v-else>
+                      <div class="events">
+                        <TabView>
+                          <TabPanel header="Nadcházející">
+                            <Event
+                              v-for="event in visibleUpcomingEvents"
+                              :name="event.name"
+                              :date="event.date"
+                              :description="event.description"
+                              :role="loggedRole"
+                              @edit="openEditEventModal(event.id)"
+                              @delete="deleteEvent(event.id)"
+                            ></Event>
+                            <Paginator
+                              :rows="4"
+                              :totalRecords="events.upcoming.length"
+                              @page="onUpcomingEventPage($event)"
+                            ></Paginator>
+                          </TabPanel>
+                          <TabPanel header="Minulé">
+                            <Event
+                              v-for="event in visiblePassedEvents"
+                              :name="event.name"
+                              :date="event.date"
+                              :description="event.description"
+                              :role="loggedRole"
+                              @edit="openEditEventModal(event.id)"
+                              @delete="deleteEvent(event.id)"
+                            ></Event>
+                            <Paginator
+                              :rows="4"
+                              :totalRecords="events.passed.length"
+                              @page="onPassedEventPage($event)"
+                            ></Paginator>
+                          </TabPanel>
+                        </TabView>
+                      </div>
+                    </template>
                   </template>
                   <template v-else>
                     <CardLoading></CardLoading>

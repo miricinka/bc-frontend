@@ -3,6 +3,8 @@ import axios, { AxiosError } from "axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 import type { IComment, IStoreCommentError, News } from "@/shared/interface";
+import { routeLocationKey } from "vue-router";
+import router from "@/router";
 
 const toast = useToast();
 const loggedRole = ref(localStorage.getItem("role"));
@@ -103,6 +105,38 @@ const deleteComment = async (id: number) => {
     return;
   }
 };
+
+/*
+deletes specific news by id and refreshes all news
+triggers success/error delete notification
+*/
+const deleteNews = async (id: number) => {
+  try {
+    if (!window.confirm("Are you sure?")) {
+      return;
+    }
+    await axios({
+      method: "delete",
+      url: "http://127.0.0.1:8000/api/news/" + id,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Novinku se nepodařilo smazat",
+      detail: "Novinku se nepodařilo smazat",
+      life: 3000,
+    });
+    return;
+  }
+  toast.add({
+    severity: "success",
+    summary: "Novinka",
+    detail: "Novinka smazána",
+    life: 3000,
+  });
+  router.push({ name: "home" });
+};
 </script>
 
 <template>
@@ -131,6 +165,7 @@ const deleteComment = async (id: number) => {
                 label="Smazat"
                 class="p-button-raised p-button-danger mx-1"
                 icon="pi pi-trash"
+                @click="deleteNews(news.id)"
               />
             </div>
           </div>
