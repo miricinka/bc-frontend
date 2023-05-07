@@ -19,6 +19,8 @@ onMounted(() => {
 
 const tournaments = ref<ITournament[]>();
 const displayModal = ref(false);
+const displayEditModal = ref(false);
+let editingTournamentId: number = 0;
 
 const form = reactive({
   title: "",
@@ -26,12 +28,27 @@ const form = reactive({
   description: "",
 });
 
+function clearForm() {
+  form.date = new Date();
+  form.description = "";
+  form.title = "";
+}
+
 function openModal() {
+  clearForm();
   displayModal.value = true;
 }
 
 function closeModal() {
   displayModal.value = false;
+}
+
+function openEditModal() {
+  displayEditModal.value = true;
+}
+
+function closeEditModal() {
+  displayEditModal.value = false;
 }
 
 async function getTournaments() {
@@ -73,7 +90,7 @@ async function submit(data: { title: string; date: any; description: string }) {
     toast.add({
       severity: "error",
       summary: "Turnament",
-      detail: "Turnament se nepodařilo vyvořit",
+      detail: "Turnament se nepodařilo vytvořit",
       life: 3000,
     });
     return;
@@ -82,6 +99,49 @@ async function submit(data: { title: string; date: any; description: string }) {
     severity: "success",
     summary: "Turnament",
     detail: "Turnament vytvořen",
+    life: 3000,
+  });
+}
+
+async function editTournament(tournament: ITournament) {
+  form.date = new Date(tournament.date);
+  form.description = tournament.description;
+  form.title = tournament.title;
+  openEditModal();
+  editingTournamentId = tournament.id;
+}
+
+async function edit(data: { title: string; date: any; description: string }) {
+  data.date = new Date(
+    data.date.getTime() - data.date.getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+  try {
+    await axios({
+      method: "put",
+      url: "http://127.0.0.1:8000/api/tournament/" + editingTournamentId,
+      data: data,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+
+    await getTournaments();
+    closeEditModal();
+    editingTournamentId = 0;
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Turnament",
+      detail: "Turnament se nepodařilo upravit",
+      life: 3000,
+    });
+    return;
+  }
+  toast.add({
+    severity: "success",
+    summary: "Turnament",
+    detail: "Turnament upraven",
     life: 3000,
   });
 }
@@ -205,6 +265,7 @@ async function unsignUser(tournamentId: number) {
                   @sign="signUser(tournament.id)"
                   @unsign="unsignUser(tournament.id)"
                   @delete="deleteTournament(tournament)"
+                  @edit="editTournament(tournament)"
                   @detail="$router.push('/tournaments/' + tournament.id)"
                 >
                 </Tournament>
@@ -306,6 +367,52 @@ async function unsignUser(tournamentId: number) {
             class="p-button-text"
           />
           <Button label="Založit turnaj" icon="pi pi-check" type="submit" />
+        </div>
+      </form>
+    </Dialog>
+
+    <Dialog
+      header="Upravit turnaj"
+      v-model:visible="displayEditModal"
+      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+      :style="{ width: '50vw' }"
+      :modal="true"
+    >
+      <form @submit.prevent="edit(form)">
+        <div>
+          <div class="m-4">
+            <h5 id="text-area-text">Název</h5>
+            <InputText type="text" v-model="form.title" />
+          </div>
+          <div class="m-4">
+            <h5 id="text-area-text">Datum</h5>
+            <Calendar
+              showIcon
+              inputId="basic"
+              v-model="form.date"
+              autocomplete="off"
+              dateFormat="dd. mm. yy"
+            />
+          </div>
+          <div class="m-4">
+            <h5 id="text-area-text">Popis</h5>
+            <Textarea
+              v-model="form.description"
+              :autoResize="true"
+              rows="5"
+              cols="50"
+              aria-labelledby="text-area-text"
+            />
+          </div>
+        </div>
+        <div>
+          <Button
+            label="Zpět"
+            icon="pi pi-times"
+            @click="closeEditModal()"
+            class="p-button-text"
+          />
+          <Button label="Upravit turnaj" icon="pi pi-check" type="submit" />
         </div>
       </form>
     </Dialog>

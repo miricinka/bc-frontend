@@ -21,11 +21,18 @@ const isEditing = ref<boolean>(false);
 const editedComment = ref<string>("");
 const errors = ref<IStoreCommentError>();
 
+/**
+ * toggle if is editing comment or not
+ */
 function toggleEdit() {
   isEditing.value = true;
   editedComment.value = props.text;
 }
 
+/**
+ * edit comment on server
+ * display notification
+ */
 async function editComment(text: string) {
   try {
     await axios({

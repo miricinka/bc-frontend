@@ -1,4 +1,4 @@
-export interface News {
+export interface INews {
   id: number;
   created_at: string;
   updated_at: string;
@@ -7,7 +7,7 @@ export interface News {
 }
 export interface INewsWithComment {
   commentCount: number;
-  news: News;
+  news: INews;
 }
 
 export interface IComment {

@@ -3,7 +3,7 @@ import router from "@/router";
 import axios, { AxiosError } from "axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "primevue/usetoast";
-import type { IStoreNewsError, News } from "@/shared/interface";
+import type { IStoreNewsError, INews } from "@/shared/interface";
 
 const toast = useToast();
 
@@ -14,13 +14,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const news = ref<News>();
+const news = ref<INews>();
 const errors = ref<IStoreNewsError>();
 
 onMounted(() => getNews(props.id));
 
 const getNews = async (id: string) => {
-  const response = await axios.get<News>(
+  const response = await axios.get<INews>(
     "http://127.0.0.1:8000/api/news/" + id
   );
   news.value = response.data;

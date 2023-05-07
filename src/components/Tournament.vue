@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const emit = defineEmits(["delete", "sign", "unsign", "detail"]);
+const emit = defineEmits(["delete", "edit", "sign", "unsign", "detail"]);
 interface Props {
   id: number;
   title: string;
@@ -49,7 +49,7 @@ const props = defineProps<Props>();
                   label="Upravit"
                   icon="pi pi-file-edit"
                   class="p-button-raised"
-                  @click="$emit('delete', id)"
+                  @click="$emit('edit', id)"
                 ></Button>
                 <Button
                   v-if="role === 'admin'"
