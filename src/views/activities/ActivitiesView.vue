@@ -372,7 +372,7 @@ function redirectToUser(winner: IUsernamePoints | undefined) {
               mode="decimal"
               showButtons
               :min="0"
-              :max="100"
+              :max="10"
             />
           </div>
           <div class="m-4">

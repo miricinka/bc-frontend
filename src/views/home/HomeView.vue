@@ -31,7 +31,7 @@ const form = reactive({
 });
 
 /*
-loads news and events
+loads news and events on component mount
 */
 onMounted(async () => {
   await getNews();
@@ -41,6 +41,9 @@ onMounted(async () => {
   await getEvents();
 });
 
+/*
+loads news from server
+*/
 async function getNews() {
   const response = await axios.get<INewsWithComment[]>(
     "http://127.0.0.1:8000/api/news"
