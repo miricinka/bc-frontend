@@ -39,3 +39,34 @@ npm run dev
 npm run build
 ```
 # bc-frontend
+
+
+### what is in this dvd
+
+xkolar76-src-be.zip -- server application
+xkolar76-src-fe.zip -- client application
+xkolar76.pdf -- thesis in pdf
+xkolar76.zip -- latex files for thesis
+readme.txt -- instructions for project setup
+
+
+## instructions for project setup
+
+### server application: 
+
+- unzip xkolar76-src-be.zip
+- configurate database connection in .env file (change env variables DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME and DB_PASSWORD)
+
+- create database schema with command ```php artisan migrate:fresh```
+seed database with command ```php artisan db:seed```
+
+- for sending emails with access informations for newly created members configurate email in .env file (change env variables MAIL_MAILER, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION) and uncomment commented code in http/controllers/userController.php
+
+- start application with command ```php artisan serve```
+
+
+### client application:
+
+- unzip xkolar76-src-fe.zip
+- install modules and libraries with command ```npm install```
+- start project with command ```npm run dev```
