@@ -347,6 +347,7 @@ async function unsignUser(tournamentId: number) {
                   "
                   @delete="deleteTournament(tournament)"
                   @sign="signUser(tournament.id)"
+                  @edit="editTournament(tournament)"
                   @unsign="unsignUser(tournament.id)"
                   @detail="$router.push('/tournaments/' + tournament.id)"
                 >
@@ -370,6 +371,7 @@ async function unsignUser(tournamentId: number) {
                   "
                   @sign="signUser(tournament.id)"
                   @unsign="unsignUser(tournament.id)"
+                  @edit="editTournament(tournament)"
                   @delete="deleteTournament(tournament)"
                   @detail="$router.push('/tournaments/' + tournament.id)"
                 >
