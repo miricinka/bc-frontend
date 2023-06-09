@@ -39,7 +39,9 @@ const getNews = async (id: string) => {
   const response = await axios.get<INews>(
     "http://127.0.0.1:8000/api/news/" + id
   );
-  news.value = response.data;
+  if (response) {
+    news.value = response.data;
+  }
 };
 
 /**
@@ -50,7 +52,9 @@ const getComments = async (id: string) => {
   const response = await axios.get<IComment[]>(
     "http://127.0.0.1:8000/api/news/" + id + "/comments"
   );
-  comments.value = response.data;
+  if (response) {
+    comments.value = response.data;
+  }
 };
 
 /**
