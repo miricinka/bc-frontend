@@ -47,7 +47,7 @@ onMounted(async () => {
  */
 async function getNews() {
   const response = await axios.get<INewsWithComment[]>(
-    "http://127.0.0.1:8000/api/news"
+    "https://sachy-kurim-be.herokuapp.com/api/news"
   );
   news.value = response.data;
   searchedNews.value = news.value;
@@ -83,7 +83,7 @@ const deleteNews = async (id: number) => {
     }
     await axios({
       method: "delete",
-      url: "http://127.0.0.1:8000/api/news/" + id,
+      url: "https://sachy-kurim-be.herokuapp.com/api/news/" + id,
       headers: { Authorization: `Bearer ${token.value}` },
     });
   } catch {
@@ -148,7 +148,7 @@ function onPassedEventPage(event: PageState) {
  */
 async function getEvents() {
   const response = await axios.get<IEventResponse>(
-    "http://127.0.0.1:8000/api/event"
+    "https://sachy-kurim-be.herokuapp.com/api/event"
   );
   events.value = response.data;
   if (events.value) {
@@ -163,7 +163,7 @@ async function getEvents() {
  */
 async function getEvent(id: number) {
   const response = await axios.get<IEvent>(
-    "http://127.0.0.1:8000/api/event/" + id
+    "https://sachy-kurim-be.herokuapp.com/api/event/" + id
   );
   editingEvent.value = response.data;
 }
@@ -181,7 +181,7 @@ async function deleteEvent(id: number) {
   try {
     await axios({
       method: "delete",
-      url: "http://127.0.0.1:8000/api/event/" + id,
+      url: "https://sachy-kurim-be.herokuapp.com/api/event/" + id,
       headers: { Authorization: `Bearer ${token.value}` },
     });
   } catch {
@@ -264,7 +264,7 @@ async function storeEvent(name: string, date: Date, description: string) {
   try {
     await axios({
       method: "post",
-      url: "http://127.0.0.1:8000/api/event/",
+      url: "https://sachy-kurim-be.herokuapp.com/api/event/",
       data: {
         name: name,
         date: new Date(date.getTime() - date.getTimezoneOffset() * 60000)
@@ -309,7 +309,9 @@ async function updateEvent(name: string, date: Date, description: string) {
     try {
       await axios({
         method: "put",
-        url: "http://127.0.0.1:8000/api/event/" + editingEvent.value.id,
+        url:
+          "https://sachy-kurim-be.herokuapp.com/api/event/" +
+          editingEvent.value.id,
         data: {
           name: name,
           date: new Date(date.getTime() - date.getTimezoneOffset() * 60000)

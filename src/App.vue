@@ -29,7 +29,7 @@ async function login(data: { username: string; password: string }) {
   loginError.value = false;
   try {
     const response: ILoginResponse = await axios.post(
-      "http://127.0.0.1:8000/api/login",
+      "https://sachy-kurim-be.herokuapp.com/api/login",
       data
     );
     //setting token and username to local browser storage
@@ -62,7 +62,7 @@ async function logout() {
   try {
     axios({
       method: "post",
-      url: "http://127.0.0.1:8000/api/logout",
+      url: "https://sachy-kurim-be.herokuapp.com/api/logout",
       headers: { Authorization: `Bearer ${token.value}` },
     });
     localStorage.removeItem("token");
