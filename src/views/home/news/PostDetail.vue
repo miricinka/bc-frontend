@@ -26,7 +26,9 @@ const errors = ref<IStoreCommentError>();
  * gets post and comments from server on component mount
  */
 onMounted(() => {
-  getNews(props.id), getComments(props.id);
+  if (props) {
+    getNews(props.id), getComments(props.id);
+  }
 });
 
 /**
