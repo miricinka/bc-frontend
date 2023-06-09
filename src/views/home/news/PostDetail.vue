@@ -194,6 +194,7 @@ const deleteNews = async (id: number) => {
                 @click="$router.push({ path: `/news/${id}/edit` })"
               />
               <Button
+                v-if="news.id"
                 label="Smazat"
                 class="p-button-raised p-button-danger mx-1"
                 icon="pi pi-trash"
